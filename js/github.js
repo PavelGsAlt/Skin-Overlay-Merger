@@ -15,6 +15,48 @@ export class GitHubManager {
         this.elements = elements;
     }
 
+    /**
+     * Fetches overlay folders and PNG files from a GitHub repository using the GitHub API.
+     * @param {string} repoUrl - The GitHub repository URL (e.g., https://github.com/PavelGsAlt/pavelgsalt.github.io)
+     * @returns {Promise<Array>} - Array of overlay file objects with name and download_url
+     */
+    async fetchOverlays(repoUrl) {
+        // Extract owner and repo from the URL
+        const match = repoUrl.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+        if (!match) {
+            throw new Error('Invalid GitHub repository URL.');
+        }
+        const owner = match[1];
+        const repo = match[2];
+        const overlaysApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/Overlays`;
+
+        // Fetch the Overlays folder contents
+        const overlaysResp = await fetch(overlaysApiUrl);
+        if (!overlaysResp.ok) {
+            throw new Error('Could not fetch Overlays folder from GitHub.');
+        }
+        const overlaysFolders = await overlaysResp.json();
+
+        // Collect PNG files from all subfolders
+        const overlayFiles = [];
+        for (const folder of overlaysFolders) {
+            if (folder.type === 'dir') {
+                const subResp = await fetch(folder.url);
+                if (!subResp.ok) continue;
+                const files = await subResp.json();
+                for (const file of files) {
+                    if (file.type === 'file' && file.name.endsWith('.png')) {
+                        overlayFiles.push({
+                            name: `${folder.name}/${file.name}`,
+                            url: file.download_url
+                        });
+                    }
+                }
+            }
+        }
+        return overlayFiles;
+    }
+
     async fetchRepositoryContents(repoUrl) {
         const parsed = parseGitHubUrl(repoUrl);
         if (!parsed) {
