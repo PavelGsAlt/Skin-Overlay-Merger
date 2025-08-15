@@ -195,6 +195,40 @@ export class GitHubManager {
         }
     }
 
+    async fetchOverlaysViaProxy() {
+        // Call your Netlify proxy function
+        const proxyUrl = "https://skinoverlay.netlify.app/.netlify/functions/github-proxy";
+        const response = await fetch(proxyUrl);
+        if (!response.ok) {
+            throw new Error('Could not fetch overlays from proxy.');
+        }
+        const data = await response.json();
+        // data should be an array of overlay file objects: { name, url }
+        return data;
+    }
+
+    async fetchRepositoryContentsViaProxy() {
+        this.setLoading(true);
+        try {
+            const overlays = await this.fetchOverlaysViaProxy();
+            // overlays: [{ name: "Aurora Sorcerer/normal.png", url: "..." }, ...]
+            // Group overlays by folder for rendering
+            const foldersMap = {};
+            overlays.forEach(file => {
+                const [folder, fileName] = file.name.split('/');
+                if (!foldersMap[folder]) foldersMap[folder] = [];
+                foldersMap[folder].push(file);
+            });
+            this.folders = Object.entries(foldersMap).map(([name, files]) => ({ name, files }));
+            this.renderOverlays();
+            this.showSuccess(`Loaded ${this.folders.length} overlay folders.`);
+        } catch (err) {
+            this.showError(err.message || 'Failed to fetch overlays from proxy.');
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
     setLoading(loading) {
         this.loading = loading;
         
