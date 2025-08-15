@@ -80,6 +80,14 @@ export class GitHubManager {
                 cache: 'no-cache'
             });
             
+            // Check for rate limiting
+            if (overlaysResponse.status === 403) {
+                const remaining = overlaysResponse.headers.get('X-RateLimit-Remaining');
+                if (remaining === '0') {
+                    throw new Error('GitHub API rate limit exceeded. Please wait and try again later.');
+                }
+            }
+
             console.log('Response status:', overlaysResponse.status);
             
             if (!overlaysResponse.ok) {
