@@ -16,200 +16,26 @@ export class GitHubManager {
     }
 
     /**
-     * Fetches overlay folders and PNG files from a GitHub repository using the GitHub API.
-     * @param {string} repoUrl - The GitHub repository URL (e.g., https://github.com/PavelGsAlt/pavelgsalt.github.io)
-     * @returns {Promise<Array>} - Array of overlay file objects with name and download_url
+     * Fetches overlay folders and PNG files from the Netlify proxy function.
+     * @returns {Promise<Array>} - Array of overlay file objects with name and url
      */
-    async fetchOverlays(repoUrl) {
-        // Extract owner and repo from the URL
-        const match = repoUrl.match(/github\.com\/([^\/]+)\/([^\/]+)/);
-        if (!match) {
-            throw new Error('Invalid GitHub repository URL.');
-        }
-        const owner = match[1];
-        const repo = match[2];
-        const overlaysApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/Overlays`;
-
-        // Fetch the Overlays folder contents
-        const overlaysResp = await fetch(overlaysApiUrl);
-        if (!overlaysResp.ok) {
-            throw new Error('Could not fetch Overlays folder from GitHub.');
-        }
-        const overlaysFolders = await overlaysResp.json();
-
-        // Collect PNG files from all subfolders
-        const overlayFiles = [];
-        for (const folder of overlaysFolders) {
-            if (folder.type === 'dir') {
-                const subResp = await fetch(folder.url);
-                if (!subResp.ok) continue;
-                const files = await subResp.json();
-                for (const file of files) {
-                    if (file.type === 'file' && file.name.endsWith('.png')) {
-                        overlayFiles.push({
-                            name: `${folder.name}/${file.name}`,
-                            url: file.download_url
-                        });
-                    }
-                }
-            }
-        }
-        return overlayFiles;
-    }
-
-    async fetchRepositoryContents(repoUrl) {
-        const parsed = parseGitHubUrl(repoUrl);
-        if (!parsed) {
-            this.showError(MESSAGES.invalidRepoUrl);
-            return;
-        }
-
-        this.setLoading(true);
-        console.log('Fetching repository contents for:', parsed);
-
-        try {
-            // First, check if Overlays folder exists
-            const overlaysUrl = `${CONFIG.GITHUB_API_BASE}/${parsed.owner}/${parsed.repo}/contents/Overlays`;
-            console.log('Fetching from:', overlaysUrl);
-            
-            const overlaysResponse = await fetch(overlaysUrl, {
-                headers: {
-                    'Accept': 'application/vnd.github.v3+json',
-                    'User-Agent': CONFIG.GITHUB_USER_AGENT
-                },
-                cache: 'no-cache'
-            });
-            
-            // Check for rate limiting
-            if (overlaysResponse.status === 403) {
-                const remaining = overlaysResponse.headers.get('X-RateLimit-Remaining');
-                if (remaining === '0') {
-                    throw new Error('GitHub API rate limit exceeded. Please wait and try again later.');
-                }
-            }
-
-            console.log('Response status:', overlaysResponse.status);
-            
-            if (!overlaysResponse.ok) {
-                if (overlaysResponse.status === 404) {
-                    throw new Error(MESSAGES.overlaysFolderNotFound);
-                } else if (overlaysResponse.status === 403) {
-                    const rateLimitReset = overlaysResponse.headers.get('x-ratelimit-reset');
-                    const resetTime = rateLimitReset ? new Date(parseInt(rateLimitReset) * 1000) : null;
-                    throw new Error(MESSAGES.rateLimitExceeded(resetTime));
-                } else {
-                    throw new Error(MESSAGES.githubApiError(overlaysResponse.status, overlaysResponse.statusText));
-                }
-            }
-
-            const overlaysData = await overlaysResponse.json();
-            console.log('Overlays data received:', overlaysData);
-            
-            if (!Array.isArray(overlaysData)) {
-                console.error('Unexpected response format:', overlaysData);
-                throw new Error(MESSAGES.unexpectedResponse);
-            }
-
-            // Filter for directories only
-            const overlayFolders = overlaysData.filter(item => item.type === 'dir');
-            console.log('Found overlay folders:', overlayFolders.length);
-            
-            if (overlayFolders.length === 0) {
-                throw new Error(MESSAGES.noOverlayFolders);
-            }
-
-            // Fetch contents of each overlay folder
-            const folderPromises = overlayFolders.map(async (folder) => {
-                try {
-                    const folderUrl = `${CONFIG.GITHUB_API_BASE}/${parsed.owner}/${parsed.repo}/contents/Overlays/${encodeURIComponent(folder.name)}`;
-                    console.log('Fetching folder:', folder.name, folderUrl);
-                    
-                    const folderResponse = await fetch(folderUrl, {
-                        headers: {
-                            'Accept': 'application/vnd.github.v3+json',
-                            'User-Agent': CONFIG.GITHUB_USER_AGENT
-                        },
-                        cache: 'no-cache'
-                    });
-                    
-                    if (!folderResponse.ok) {
-                        console.warn(`Failed to fetch contents of folder: ${folder.name} (${folderResponse.status})`);
-                        return null;
-                    }
-                    
-                    const folderData = await folderResponse.json();
-                    console.log(`Folder ${folder.name} contains ${folderData.length} items`);
-                    
-                    if (!Array.isArray(folderData)) {
-                        console.warn(`Unexpected data format for folder: ${folder.name}`, folderData);
-                        return null;
-                    }
-                    
-                    // Filter for PNG files only and ensure they have download URLs
-                    const pngFiles = folderData.filter(file => 
-                        file.type === 'file' && 
-                        file.name.toLowerCase().endsWith('.png') &&
-                        file.download_url &&
-                        file.size > 0 // Ensure file is not empty
-                    );
-                    
-                    console.log(`Found ${pngFiles.length} PNG files in ${folder.name}:`, pngFiles.map(f => f.name));
-                    
-                    return {
-                        name: folder.name,
-                        files: pngFiles
-                    };
-                } catch (err) {
-                    console.error(`Error fetching folder ${folder.name}:`, err);
-                    return null;
-                }
-            });
-
-            console.log('Fetching all folder contents...');
-            const folderResults = await Promise.all(folderPromises);
-            const validFolders = folderResults.filter(folder => 
-                folder !== null && folder.files.length > 0
-            );
-
-            console.log('Valid folders with files:', validFolders.length);
-
-            if (validFolders.length === 0) {
-                throw new Error(MESSAGES.noPngFiles);
-            }
-
-            this.folders = validFolders;
-            this.renderOverlays();
-            this.showSuccess(MESSAGES.githubSuccess(
-                validFolders.length, 
-                validFolders.reduce((sum, f) => sum + f.files.length, 0)
-            ));
-            
-            console.log('Successfully loaded', validFolders.length, 'folders with overlays');
-            
-        } catch (err) {
-            console.error('Fetch error:', err);
-            const errorMessage = err instanceof Error ? err.message : 'Failed to fetch repository contents';
-            this.showError(errorMessage);
-        } finally {
-            this.setLoading(false);
-        }
-    }
-
     async fetchOverlaysViaProxy() {
-        // Call your Netlify proxy function
         const proxyUrl = "https://skinoverlay.netlify.app/.netlify/functions/github-proxy";
         const response = await fetch(proxyUrl);
         if (!response.ok) {
             throw new Error('Could not fetch overlays from proxy.');
         }
         const data = await response.json();
-        // data should be an array of overlay file objects: { name, url }
         return data;
     }
 
-    async fetchRepositoryContentsViaProxy() {
+    /**
+     * Fetches overlays and renders them using the Netlify proxy.
+     */
+    async fetchRepositoryContents(repoUrl) {
         this.setLoading(true);
         try {
+            // Ignore repoUrl, always use proxy for overlays
             const overlays = await this.fetchOverlaysViaProxy();
             // overlays: [{ name: "Aurora Sorcerer/normal.png", url: "..." }, ...]
             // Group overlays by folder for rendering
