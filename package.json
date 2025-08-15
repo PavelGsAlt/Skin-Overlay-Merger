@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/PavelGsAlt/pavelgsalt.github.io#readme",
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^7.0.0"
+    "@fortawesome/fontawesome-free": "^7.0.0",
+    "node-fetch": "^2.6.7"
   }
 }
