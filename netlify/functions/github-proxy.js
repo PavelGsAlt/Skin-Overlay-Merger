@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 exports.handler = async (event, context) => {
   const headers = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': 'https://pavelgsalt.github.io', // Only allow your GitHub Pages site
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   };
@@ -42,7 +42,7 @@ exports.handler = async (event, context) => {
         if (file.type === "file" && file.name.endsWith(".png")) {
           overlayFiles.push({
             name: `${folder.name}/${file.name}`,
-            url: file.download_url,
+            download_url: file.download_url,
             size: file.size
           });
         }
