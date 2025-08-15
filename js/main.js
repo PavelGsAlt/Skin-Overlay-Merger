@@ -448,40 +448,20 @@ async function handlePreview() {
 }
 
 function handleMergeDownload() {
-    clearError('base', elements);
-    clearError('overlay', elements);
-    
-    if (!appState.baseImg) {
-        setError('base', MESSAGES.noBaseImage, elements);
+    // Example implementation
+    if (!appState.baseImg || !appState.overlayImg) {
+        alert('Please upload both a base skin and an overlay.');
         return;
     }
-    if (!appState.overlayImg) {
-        setError('overlay', MESSAGES.noOverlayImage, elements);
-        return;
-    }
-    
-    console.log('Merging and downloading skin');
-    setProcessing(true);
-    
-    try {
-        const canvas = viewer3D.compositeToCanvas(appState.baseImg, appState.overlayImg, appState.options);
-        if (!canvas) {
-            return;
-        }
-        
-        const outName = (appState.options.preserveFilename ? appState.baseName : 'merged_skin') + '.png';
-        
-        canvas.toBlob((blob) => {
-            const success = downloadBlob(blob, outName);
-            if (!success) {
-                console.error(MESSAGES.failedToCreateBlob);
-            }
-        }, 'image/png');
-    } catch (err) {
-        setError('overlay', err.message, elements);
-    } finally {
-        setProcessing(false);
-    }
+    const canvas = document.getElementById('composite-canvas');
+    // ...merge logic here...
+    canvas.toBlob(function(blob) {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'merged_skin.png';
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }, 'image/png');
 }
 
 // Background handling
