@@ -5,6 +5,7 @@ exports.handler = async (event, context) => {
     'Access-Control-Allow-Origin': 'https://pavelgsalt.github.io', // Only allow your GitHub Pages site
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Content-Type': 'application/json', // <-- Add this line
   };
 
   // Handle OPTIONS preflight request
