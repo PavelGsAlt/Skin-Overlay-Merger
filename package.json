@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/PavelGsAlt/pavelgsalt.github.io/issues"
   },
-  "homepage": "https://github.com/PavelGsAlt/pavelgsalt.github.io#readme"
+  "homepage": "https://github.com/PavelGsAlt/pavelgsalt.github.io#readme",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.0.0"
+  }
 }
