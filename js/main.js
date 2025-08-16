@@ -539,22 +539,7 @@ function handleSelectOverlay(file) {
     console.error('No file selected');
     return;
   }
-  propOnSelectOverlay(file.download_url);
-}
-
-function showGitHubModal() {
-  elements.githubModal.style.display = 'flex';
-  // Auto-fetch default repository
-  if (elements.repoUrlInput.value === 'https://github.com/PavelGsAlt/pavelgsalt.github.io') {
-    console.log('Auto-fetching default repository');
-    fetchRepositoryContents();
-  }
-  // Pass the onSelectOverlay prop to the GitHubOverlayBrowserComp component
-  const onSelectOverlay = (overlayUrl) => {
-    console.log('Overlay selected:', overlayUrl);
-    // Add logic here to handle the selected overlay
-  };
-  renderGitHubOverlayBrowser(onSelectOverlay);
+  onSelectOverlay(file.download_url);
 }
 
 function renderGitHubOverlayBrowser(onSelectOverlay) {
