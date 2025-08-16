@@ -221,3 +221,8 @@ export function parseGitHubUrl(url) {
     }
     return null;
 }
+
+function githubOverlayError(message) {
+  console.error('GitHub overlay error:', message);
+  // You can also add additional error handling logic here
+}

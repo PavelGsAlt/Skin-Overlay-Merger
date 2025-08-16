@@ -517,6 +517,11 @@ function removeBackground() {
 function showGitHubModal() {
     setElementDisplay(elements.githubModal, 'flex');
     
+    if (repoUrl === undefined || repoUrl === '') {
+    console.error('Invalid repository URL');
+    return;
+  }
+
     // Auto-fetch default repository
     if (elements.repoUrlInput?.value === CONFIG.DEFAULT_REPO_URL) {
         console.log('Auto-fetching default repository');
@@ -527,4 +532,39 @@ function showGitHubModal() {
 function hideGitHubModal() {
     setElementDisplay(elements.githubModal, 'none');
     githubManager.setSearchTerm('');
+}
+
+function handleSelectOverlay(file) {
+  if (!file) {
+    console.error('No file selected');
+    return;
+  }
+  propOnSelectOverlay(file.download_url);
+}
+
+function showGitHubModal() {
+  elements.githubModal.style.display = 'flex';
+  // Auto-fetch default repository
+  if (elements.repoUrlInput.value === 'https://github.com/PavelGsAlt/pavelgsalt.github.io') {
+    console.log('Auto-fetching default repository');
+    fetchRepositoryContents();
+  }
+  // Pass the onSelectOverlay prop to the GitHubOverlayBrowserComp component
+  const onSelectOverlay = (overlayUrl) => {
+    console.log('Overlay selected:', overlayUrl);
+    // Add logic here to handle the selected overlay
+  };
+  renderGitHubOverlayBrowser(onSelectOverlay);
+}
+
+function renderGitHubOverlayBrowser(onSelectOverlay) {
+  const githubOverlayBrowser = (
+    <GitHubOverlayBrowserComp
+      isOpen={true}
+      onClose={() => {}}
+      onSelectOverlay={onSelectOverlay}
+    />
+  );
+  // Render the githubOverlayBrowser component
+  ReactDOM.render(githubOverlayBrowser, elements.githubOverlayBrowser);
 }
