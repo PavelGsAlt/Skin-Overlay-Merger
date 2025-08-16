@@ -38,36 +38,6 @@ interface GitHubOverlayBrowserProps {
 const GitHubOverlayBrowser: React.FC<GitHubOverlayBrowserProps> = ({
   isOpen,
   onClose,
-  onSelectOverlay: propOnSelectOverlay,
-}) => {
-
-   return (
-    <Dialog isOpen={isOpen} onClose={onClose}>
-      {/* Your dialog content here */}
-    </Dialog>
-  );
-  const [repoUrl, setRepoUrl] = useState<string>('https://github.com/PavelGsAlt/pavelgsalt.github.io');
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
-  const [folders, setFolders] = useState<GitHubFolder[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>('');
-
-  const handleSelectOverlay = (file: GitHubFile) => {
-    if (!file.download_url) {
-      console.error('No download URL for file:', file);
-      return;
-    }
-    
-    console.log('Selecting overlay:', file.name, file.download_url);
-    propOnSelectOverlay(file.download_url); // Call the onSelectOverlay prop
-  };
-
-  // ...
-};
-
-const GitHubOverlayBrowserComp = ({
-  isOpen,
-  onClose,
   onSelectOverlay,
 }) => {
 
@@ -94,121 +64,73 @@ const GitHubOverlayBrowserComp = ({
     return null;
   };
 
-  // Fetch repository contents with better error handling
+  // Fetch repository contents using the proxy API
   const fetchRepositoryContents = async () => {
-    const parsed = parseGitHubUrl(repoUrl);
-    if (!parsed) {
-      setError('Invalid GitHub repository URL. Please use format: https://github.com/owner/repo');
-      return;
-    }
-
     setLoading(true);
     setError('');
     setFolders([]);
-    console.log('Fetching repository contents for:', parsed);
+    console.log('Fetching repository contents via proxy');
 
     try {
-      // First, check if Overlays folder exists
-      const overlaysUrl = `https://api.github.com/repos/${parsed.owner}/${parsed.repo}/contents/Overlays`;
-      console.log('Fetching from:', overlaysUrl);
+      // Use the proxy endpoint for the default repository
+      const proxyUrl = "https://skinoverlay.netlify.app/.netlify/functions/github-proxy";
+      console.log('Fetching from proxy:', proxyUrl);
       
-      const overlaysResponse = await fetch(overlaysUrl, {
+      const response = await fetch(proxyUrl, {
         headers: {
-          'Accept': 'application/vnd.github.v3+json',
-          'User-Agent': 'MinecraftSkinOverlayMerger/1.0'
+          'Accept': 'application/json'
         },
-        // Add cache control
         cache: 'no-cache'
       });
       
-      console.log('Response status:', overlaysResponse.status);
-      console.log('Response headers:', Object.fromEntries(overlaysResponse.headers.entries()));
+      console.log('Response status:', response.status);
       
-      if (!overlaysResponse.ok) {
-        if (overlaysResponse.status === 404) {
-          throw new Error('Overlays folder not found in repository. Make sure the repository has an "Overlays" folder in the root.');
-        } else if (overlaysResponse.status === 403) {
-          const rateLimitReset = overlaysResponse.headers.get('x-ratelimit-reset');
-          const resetTime = rateLimitReset ? new Date(parseInt(rateLimitReset) * 1000) : null;
-          throw new Error(`GitHub API rate limit exceeded. ${resetTime ? `Try again after ${resetTime.toLocaleTimeString()}.` : 'Please try again later.'}`);
-        } else {
-          throw new Error(`GitHub API error: ${overlaysResponse.status} ${overlaysResponse.statusText}`);
+      if (!response.ok) {
+        throw new Error(`Proxy API error: ${response.status} ${response.statusText}`);
+      }
+
+      const overlayFiles = await response.json();
+      console.log('Overlay files received:', overlayFiles);
+      
+      if (!Array.isArray(overlayFiles)) {
+        console.error('Unexpected response format:', overlayFiles);
+        throw new Error('Unexpected response format from proxy API');
+      }
+
+      if (overlayFiles.length === 0) {
+        throw new Error('No overlay files found in the repository.');
+      }
+
+      // Group files by folder (proxy returns files with name like "folder/file.png")
+      const foldersMap: { [key: string]: GitHubFile[] } = {};
+      
+      overlayFiles.forEach((file: any) => {
+        const [folderName, fileName] = file.name.split('/');
+        if (!folderName || !fileName) return;
+        
+        if (!foldersMap[folderName]) {
+          foldersMap[folderName] = [];
         }
-      }
-
-      const overlaysData = await overlaysResponse.json();
-      console.log('Overlays data received:', overlaysData);
-      
-      if (!Array.isArray(overlaysData)) {
-        console.error('Unexpected response format:', overlaysData);
-        throw new Error('Unexpected response format from GitHub API');
-      }
-
-      // Filter for directories only
-      const overlayFolders = overlaysData.filter((item: GitHubFile) => item.type === 'dir');
-      console.log('Found overlay folders:', overlayFolders.length);
-      
-      if (overlayFolders.length === 0) {
-        throw new Error('No overlay folders found in /Overlays directory. Create subfolders in /Overlays with PNG files.');
-      }
-
-      // Fetch contents of each overlay folder with better error handling
-      const folderPromises = overlayFolders.map(async (folder: GitHubFile) => {
-        try {
-          const folderUrl = `https://api.github.com/repos/${parsed.owner}/${parsed.repo}/contents/Overlays/${encodeURIComponent(folder.name)}`;
-          console.log('Fetching folder:', folder.name, folderUrl);
-          
-          const folderResponse = await fetch(folderUrl, {
-            headers: {
-              'Accept': 'application/vnd.github.v3+json',
-              'User-Agent': 'MinecraftSkinOverlayMerger/1.0'
-            },
-            cache: 'no-cache'
-          });
-          
-          if (!folderResponse.ok) {
-            console.warn(`Failed to fetch contents of folder: ${folder.name} (${folderResponse.status})`);
-            return null;
-          }
-          
-          const folderData = await folderResponse.json();
-          console.log(`Folder ${folder.name} contains ${folderData.length} items`);
-          
-          if (!Array.isArray(folderData)) {
-            console.warn(`Unexpected data format for folder: ${folder.name}`, folderData);
-            return null;
-          }
-          
-          // Filter for PNG files only and ensure they have download URLs
-          const pngFiles = folderData.filter((file: GitHubFile) => 
-            file.type === 'file' && 
-            file.name.toLowerCase().endsWith('.png') &&
-            file.download_url &&
-            file.size > 0 // Ensure file is not empty
-          );
-          
-          console.log(`Found ${pngFiles.length} PNG files in ${folder.name}:`, pngFiles.map(f => f.name));
-          
-          return {
-            name: folder.name,
-            files: pngFiles
-          };
-        } catch (err) {
-          console.error(`Error fetching folder ${folder.name}:`, err);
-          return null;
-        }
+        
+        // Map proxy format to expected format
+        foldersMap[folderName].push({
+          name: fileName,
+          path: file.name,
+          download_url: file.url, // Map 'url' to 'download_url'
+          type: 'file',
+          size: file.size || 0
+        });
       });
 
-      console.log('Fetching all folder contents...');
-      const folderResults = await Promise.all(folderPromises);
-      const validFolders = folderResults.filter((folder): folder is GitHubFolder => 
-        folder !== null && folder.files.length > 0
-      );
+      const validFolders = Object.entries(foldersMap).map(([name, files]) => ({
+        name,
+        files
+      })).filter(folder => folder.files.length > 0);
 
       console.log('Valid folders with files:', validFolders.length);
 
       if (validFolders.length === 0) {
-        throw new Error('No PNG files found in overlay folders. Make sure your overlay folders contain PNG files.');
+        throw new Error('No valid overlay folders found.');
       }
 
       setFolders(validFolders);
@@ -513,4 +435,6 @@ const GitHubOverlayBrowserComp = ({
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default GitHubOverlayBrowser;
