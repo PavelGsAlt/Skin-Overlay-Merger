@@ -6,6 +6,7 @@ import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { Skeleton } from './ui/skeleton';
 import { Folder, File, Download, Search, Github, AlertCircle, ExternalLink, RefreshCw, Eye } from 'lucide-react';
+import { jsx } from 'react/jsx-runtime';
 
 interface GitHubFile {
   name: string;
@@ -26,12 +27,55 @@ interface GitHubOverlayBrowserProps {
   onSelectOverlay: (overlayUrl: string) => void;
 }
 
-export function GitHubOverlayBrowser({ isOpen, onClose, onSelectOverlay }: GitHubOverlayBrowserProps) {
-  const [repoUrl, setRepoUrl] = useState('https://github.com/PavelGsAlt/pavelgsalt.github.io');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+/**
+ * A component that displays a dialog containing a browser for GitHub overlays.
+ * 
+ * @param {GitHubOverlayBrowserProps} props - The component props.
+ * @param {boolean} props.isOpen - Whether the dialog is open or not.
+ * @param {() => void} props.onClose - A function to close the dialog.
+ * @param {(overlayUrl: string) => void} props.onSelectOverlay - A function to be called when an overlay is selected.
+ */
+const GitHubOverlayBrowser: React.FC<GitHubOverlayBrowserProps> = ({
+  isOpen,
+  onClose,
+  onSelectOverlay: propOnSelectOverlay,
+}) => {
+
+   return (
+    <Dialog isOpen={isOpen} onClose={onClose}>
+      {/* Your dialog content here */}
+    </Dialog>
+  );
+  const [repoUrl, setRepoUrl] = useState<string>('https://github.com/PavelGsAlt/pavelgsalt.github.io');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
   const [folders, setFolders] = useState<GitHubFolder[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState<string>('');
+
+  const handleSelectOverlay = (file: GitHubFile) => {
+    if (!file.download_url) {
+      console.error('No download URL for file:', file);
+      return;
+    }
+    
+    console.log('Selecting overlay:', file.name, file.download_url);
+    propOnSelectOverlay(file.download_url); // Call the onSelectOverlay prop
+  };
+
+  // ...
+};
+
+const GitHubOverlayBrowserComp = ({
+  isOpen,
+  onClose,
+  onSelectOverlay,
+}) => {
+
+  const [repoUrl, setRepoUrl] = useState<string>('https://github.com/PavelGsAlt/pavelgsalt.github.io');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
+  const [folders, setFolders] = useState<GitHubFolder[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   // Parse GitHub URL to get API endpoint
   const parseGitHubUrl = (url: string) => {
