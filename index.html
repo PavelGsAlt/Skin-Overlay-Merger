@@ -1,460 +1,158 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Free online tool to merge Minecraft skins with overlays. Upload your base skin and overlay, preview in 3D, and download instantly.">
-    <meta name="keywords" content="minecraft skin overlay, skin merger, skin combiner, skin editor">
-    <link rel="icon" href="favicon.png" type="image/png">
-    <title>Minecraft Skin Overlay Merger</title>
-    <link rel="stylesheet" href="styles.css">
-    
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YQ3SZCT8EF"></script>
-    <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>404 — not here</title>
 
-    gtag('config', 'G-YQ3SZCT8EF');
-    </script>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;900&display=swap" rel="stylesheet">
 
-    <!-- Three.js and skinview3d -->
-    <script src="https://unpkg.com/three@0.150.1/build/three.min.js"></script>
-    <script src="https://unpkg.com/skinview3d@2.2.0/bundles/skinview3d.bundle.js"></script>
-    
-    <!-- React and ReactDOM -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+	<style>
+		:root {
+			--bg: #0b0f14;
+			--fg: #e6f1ff;
+			--muted: #90a4b8;
+			--accent: #7cf3ff;
+			--accent2: #ff4d7e;
+			--glass-bg: rgba(255, 255, 255, 0.06);
+			--glass-border: rgba(255, 255, 255, 0.2);
+		}
+
+		html, body {
+			height: 100%;
+		}
+		body {
+			margin: 0;
+			font-family: Inter, system-ui, sans-serif;
+			background: radial-gradient(circle at top left, #121826, #0b0f14 60%),
+			            radial-gradient(circle at bottom right, #101c2e, transparent 50%);
+			color: var(--fg);
+			display: grid;
+			grid-template-rows: auto 1fr auto;
+			min-height: 100svh;
+			overflow: hidden;
+			position: relative;
+		}
+
+		/* Blurred glowing shapes */
+		.shape {
+			position: fixed;
+			border-radius: 50%;
+			filter: blur(140px);
+			opacity: 0.5;
+			mix-blend-mode: screen;
+			z-index: -1;
+			animation: float 20s ease-in-out infinite alternate;
+		}
+		.shape1 {
+			background: var(--accent);
+			width: 500px; height: 500px;
+			top: -10%; left: -10%;
+		}
+		.shape2 {
+			background: var(--accent2);
+			width: 600px; height: 600px;
+			bottom: -15%; right: -15%;
+			animation-delay: 4s;
+		}
+		.shape3 {
+			background: #6c4dff;
+			width: 400px; height: 400px;
+			top: 50%; left: 70%;
+			animation-delay: 8s;
+		}
+		@keyframes float {
+			0% { transform: translate(0,0) scale(1); }
+			50% { transform: translate(60px, -40px) scale(1.1); }
+			100% { transform: translate(-40px, 20px) scale(1); }
+		}
+
+		header, footer {
+			text-align: center;
+			padding: 24px clamp(16px, 5vw, 48px);
+		}
+		header .top {
+			font-size: clamp(14px, 2.5vw, 18px);
+			letter-spacing: .12em;
+			text-transform: uppercase;
+			color: var(--muted);
+			opacity: .9;
+		}
+
+		main {
+			display: grid;
+			place-items: center;
+			padding: clamp(16px, 3vw, 32px);
+		}
+
+		/* Glassmorphic box */
+		.glass {
+			position: relative;
+			padding: clamp(32px, 6vw, 64px) clamp(24px, 5vw, 64px);
+			background: var(--glass-bg);
+			border: 1px solid var(--glass-border);
+			backdrop-filter: blur(20px) saturate(140%);
+			-webkit-backdrop-filter: blur(20px) saturate(140%);
+			border-radius: 24px;
+			box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+			text-align: center;
+		}
+
+		.glass .glitch {
+			position: relative;
+			font-weight: 900;
+			font-size: clamp(72px, 25vw, 240px);
+			letter-spacing: .02em;
+			text-transform: uppercase;
+			color: var(--fg);
+			text-shadow:
+				0 0 10px var(--accent),
+				0 0 20px var(--accent),
+				0 0 40px var(--accent2);
+			animation: glowFlicker 3s infinite;
+			user-select: none;
+		}
+
+		/* Irregular flicker animation */
+		@keyframes glowFlicker {
+			0%   { opacity: 1;   text-shadow: 0 0 6px var(--accent), 0 0 20px var(--accent), 0 0 30px var(--accent2); }
+			10%  { opacity: 0.85;text-shadow: 0 0 2px var(--accent), 0 0 10px var(--accent2); }
+			20%  { opacity: 1;   text-shadow: 0 0 12px var(--accent), 0 0 25px var(--accent2), 0 0 50px var(--accent); }
+			35%  { opacity: 0.7; text-shadow: 0 0 4px var(--accent); }
+			50%  { opacity: 1;   text-shadow: 0 0 18px var(--accent2), 0 0 40px var(--accent); }
+			65%  { opacity: 0.9; text-shadow: 0 0 8px var(--accent), 0 0 20px var(--accent2); }
+			80%  { opacity: 1;   text-shadow: 0 0 15px var(--accent2), 0 0 35px var(--accent); }
+			90%  { opacity: 0.8; text-shadow: 0 0 6px var(--accent); }
+			100% { opacity: 1;   text-shadow: 0 0 12px var(--accent), 0 0 30px var(--accent2), 0 0 60px var(--accent); }
+		}
+
+		footer .bottom {
+			color: var(--muted);
+			font-size: clamp(12px, 2.2vw, 16px);
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			* { animation: none !important; }
+		}
+	</style>
 </head>
 <body>
-    <div class="app">
-        <!-- Header -->
-        <header class="app-header">
-            <div class="header-content">
-                <div class="header-left">
-                    <div class="logo">MS</div>
-                    <div class="header-text">
-                        <h1>Minecraft Skin Overlay Merger</h1>
-                        <p class="subtitle">Merge your Minecraft skins with overlays • Client-side processing • No uploads</p>
-                    </div>
-                </div>
-                <div class="header-badges">
-                    <span class="badge badge-beta">Beta</span>
-                    <span class="badge badge-ready" id="scripts-ready" style="display: none;">3D Ready</span>
-                </div>
-            </div>
-        </header>
+	<div class="shape shape1"></div>
+	<div class="shape shape2"></div>
+	<div class="shape shape3"></div>
 
-        <div class="main-content">
-            <div class="content-grid">
-                <!-- Main Upload Section -->
-                <div class="upload-section">
-                    <!-- Upload Cards -->
-                    <div class="upload-cards">
-                        <!-- Base Skin Upload -->
-                        <div class="upload-card">
-                            <div class="card-header">
-                                <div class="card-title">
-                                    <svg class="icon icon-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
-                                        <circle cx="9" cy="9" r="2"/>
-                                        <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
-                                    </svg>
-                                    Base Skin
-                                </div>
-                                <p class="card-description">Your main Minecraft skin (64×64 recommended)</p>
-                            </div>
-                            <div class="card-content">
-                                <div class="upload-zone" id="base-upload-zone" data-type="base">
-                                    <div class="upload-content" id="base-upload-content">
-                                        <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                            <polyline points="7,10 12,15 17,10"/>
-                                            <line x1="12" y1="15" x2="12" y2="3"/>
-                                        </svg>
-                                        <p class="upload-text">Click to upload or drag & drop</p>
-                                    </div>
-                                    <div class="preview-overlay" style="display: none;">
-                                        <button class="preview-btn" id="base-preview-btn">
-                                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-                                                <circle cx="12" cy="12" r="3"/>
-                                            </svg>
-                                            Preview
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <div class="card-actions" id="base-actions" style="display: none;">
-                                    <button class="btn-clear" id="base-clear-btn">
-                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M18 6 6 18"/>
-                                            <path d="m6 6 12 12"/>
-                                        </svg>
-                                        Clear
-                                    </button>
-                                </div>
+	<header>
+		<div class="top">not here</div>
+	</header>
 
-                                <div class="status-message error" id="base-error" style="display: none;">
-                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <line x1="15" y1="9" x2="9" y2="15"/>
-                                        <line x1="9" y1="9" x2="15" y2="15"/>
-                                    </svg>
-                                    <span id="base-error-text"></span>
-                                </div>
+	<main>
+		<div class="glass">
+			<div class="glitch">404</div>
+		</div>
+	</main>
 
-                                <div class="status-message success" id="base-success" style="display: none;">
-                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                        <polyline points="22,4 12,14.01 9,11.01"/>
-                                    </svg>
-                                    <span id="base-success-text"></span>
-                                </div>
-                            </div>
-                            <input type="file" id="base-file-input" accept="image/png,image/*" style="display: none;">
-                        </div>
-
-                        <!-- Overlay Upload -->
-                        <div class="upload-card">
-                            <div class="card-header">
-                                <div class="card-title">
-                                    <svg class="icon icon-github" id="overlay-github-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 4 5 4 5 4c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 11c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
-                                        <path d="M9 18c-4.51 2-5-2-7-2"/>
-                                    </svg>
-                                    Overlay (2nd Layer)
-                                    <span class="badge badge-github" id="github-badge" style="display: none;">GitHub</span>
-                                </div>
-                                <p class="card-description">Transparent overlay with accessories</p>
-                            </div>
-                            <div class="card-content">
-                                <div class="upload-zone" id="overlay-upload-zone" data-type="overlay">
-                                    <div class="upload-content" id="overlay-upload-content">
-                                        <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                            <polyline points="7,10 12,15 17,10"/>
-                                            <line x1="12" y1="15" x2="12" y2="3"/>
-                                        </svg>
-                                        <p class="upload-text">Click to upload or drag & drop</p>
-                                    </div>
-                                    <div class="preview-overlay" style="display: none;">
-                                        <button class="preview-btn" id="overlay-preview-btn">
-                                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-                                                <circle cx="12" cy="12" r="3"/>
-                                            </svg>
-                                            Preview
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <div class="card-button-row">
-                                    <button class="btn-github" id="github-browse-btn">
-                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 4 5 4 5 4c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 11c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
-                                            <path d="M9 18c-4.51 2-5-2-7-2"/>
-                                        </svg>
-                                        Browse GitHub
-                                    </button>
-                                    
-                                    <button class="btn-clear" id="overlay-clear-btn" style="display: none;">
-                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M18 6 6 18"/>
-                                            <path d="m6 6 12 12"/>
-                                        </svg>
-                                        Clear
-                                    </button>
-                                </div>
-
-                                <div class="status-message error" id="overlay-error" style="display: none;">
-                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <line x1="15" y1="9" x2="9" y2="15"/>
-                                        <line x1="9" y1="9" x2="15" y2="15"/>
-                                    </svg>
-                                    <span id="overlay-error-text"></span>
-                                </div>
-
-                                <div class="status-message success" id="overlay-success" style="display: none;">
-                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                        <polyline points="22,4 12,14.01 9,11.01"/>
-                                    </svg>
-                                    <span id="overlay-success-text"></span>
-                                </div>
-                            </div>
-                            <input type="file" id="overlay-file-input" accept="image/png,image/*" style="display: none;">
-                        </div>
-                    </div>
-
-                    <!-- Settings -->
-                    <div class="settings-card">
-                        <div class="card-header">
-                            <div class="card-title">
-                                <svg class="icon icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
-                                    <circle cx="12" cy="12" r="3"/>
-                                </svg>
-                                Settings
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <div class="settings-row">
-                                <div class="settings-left">
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" id="auto-resize-checkbox" class="hidden-checkbox">
-                                        <div class="custom-checkbox"></div>
-                                        <span>Auto-resize overlay</span>
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" id="preserve-filename-checkbox" class="hidden-checkbox" checked>
-                                        <div class="custom-checkbox"></div>
-                                        <span>Use base filename</span>
-                                    </label>
-                                </div>
-                                <div class="settings-right">
-                                    <button class="btn-outline" id="preview-btn" disabled>
-                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polygon points="5,3 19,12 5,21 5,3"/>
-                                        </svg>
-                                        <span id="preview-btn-text">Preview Merged</span>
-                                    </button>
-                                    <button class="btn-primary" id="merge-download-btn" disabled>
-                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                            <polyline points="7,10 12,15 17,10"/>
-                                            <line x1="12" y1="15" x2="12" y2="3"/>
-                                        </svg>
-                                        <span id="merge-btn-text">Merge & Download</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Preview Sidebar -->
-                <div class="preview-sidebar">
-                    <div class="preview-card">
-                        <div class="card-header">
-                            <div class="preview-header">
-                                <div class="preview-title">
-                                    <h3>3D Preview</h3>
-                                    <p class="preview-subtitle">Interactive skin viewer</p>
-                                </div>
-                                <div class="preview-controls-top">
-                                    <button class="btn-bg" id="bg-upload-btn">
-                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
-                                            <circle cx="9" cy="9" r="2"/>
-                                            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
-                                        </svg>
-                                        BG
-                                    </button>
-                                    <select id="bg-fit-select" class="select-small">
-                                        <option value="cover">Cover</option>
-                                        <option value="contain">Contain</option>
-                                        <option value="stretch">Stretch</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <div class="preview-stage">
-                                <canvas id="preview-canvas" width="1280" height="720"></canvas>
-                            </div>
-
-                            <div class="preview-info">
-                                <div class="preview-status" id="preview-status">Ready to preview</div>
-                                
-                                <div class="preview-controls-grid">
-                                    <div class="control-group">
-                                        <label class="control-label">Filter</label>
-                                        <select id="filter-select" class="select-small">
-                                            <option value="linear">Linear</option>
-                                            <option value="nearest">Pixel</option>
-                                        </select>
-                                    </div>
-                                    
-                                    <div class="control-group">
-                                        <label class="control-label">Zoom: <span id="zoom-value">1.0</span>x</label>
-                                        <input type="range" id="zoom-slider" class="range-slider" min="0.5" max="2" step="0.1" value="1">
-                                    </div>
-                                </div>
-                                
-                                <div class="bg-info" id="bg-info" style="display: none;">
-                                    <span class="bg-name" id="bg-name"></span>
-                                    <button class="btn-remove-bg" id="remove-bg-btn">Remove</button>
-                                </div>
-                            </div>
-
-                            <div class="tips">
-                                💡 <strong>Tips:</strong><br>
-                                • Drag & drop files directly onto upload areas<br>
-                                • Hover over uploaded skins and click "Preview"<br>
-                                • Click and drag to rotate the 3D model<br>
-                                • Upload background images to customize the scene
-                            </div>
-                        </div>
-                        
-                        <input type="file" id="bg-file-input" accept="image/*" style="display: none;">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- GitHub Browser Modal -->
-    <div class="modal-overlay" id="github-modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">
-                    <svg class="icon icon-github" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 4 5 4 5 4c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 11c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
-                        <path d="M9 18c-4.51 2-5-2-7-2"/>
-                    </svg>
-                    <h2>Browse GitHub Overlays</h2>
-                </div>
-                <p class="modal-subtitle">Browse and select overlay files from GitHub repositories</p>
-            </div>
-
-            <div class="modal-body">
-                <!-- Repository URL Input -->
-                <div class="repo-input-section">
-                    <div class="repo-input-row">
-                        <input type="text" id="repo-url-input" placeholder="https://github.com/username/repository" value="https://github.com/PavelGsAlt/pavelgsalt.github.io">
-                        <button class="btn-fetch" id="fetch-btn">
-                            <svg class="icon" id="fetch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                                <polyline points="15,3 21,3 21,9"/>
-                                <line x1="10" y1="14" x2="21" y2="3"/>
-                            </svg>
-                            <span id="fetch-text">Fetch</span>
-                        </button>
-                    </div>
-                    <p class="repo-help-text">Repository must have an "Overlays" folder with subfolders containing PNG files</p>
-                </div>
-
-                <!-- Search -->
-                <div class="search-section" id="search-section" style="display: none;">
-                    <div class="search-input-wrapper">
-                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"/>
-                            <path d="m21 21-4.35-4.35"/>
-                        </svg>
-                        <input type="text" id="search-input" placeholder="Search overlays...">
-                    </div>
-                </div>
-
-                <!-- Content Area -->
-                <div class="modal-content-area">
-                    <!-- Error State -->
-                    <div class="error-state" id="error-state" style="display: none;">
-                        <div class="error-content">
-                            <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <line x1="15" y1="9" x2="9" y2="15"/>
-                                <line x1="9" y1="9" x2="15" y2="15"/>
-                            </svg>
-                            <div class="error-text">
-                                <p class="error-title">Error fetching repository</p>
-                                <p class="error-message" id="error-message"></p>
-                                <button class="btn-retry" id="retry-btn">Try Again</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Loading State -->
-                    <div class="loading-state" id="loading-state" style="display: none;">
-                        <div class="loading-content">
-                            <svg class="loading-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 12a9 9 0 11-6.219-8.56"/>
-                            </svg>
-                            <p class="loading-title">Fetching overlays from repository...</p>
-                            <p class="loading-subtitle">This may take a moment</p>
-                        </div>
-                        <div class="loading-skeletons">
-                            <div class="skeleton-card">
-                                <div class="skeleton-title"></div>
-                                <div class="skeleton-grid">
-                                    <div class="skeleton-item"></div>
-                                    <div class="skeleton-item"></div>
-                                    <div class="skeleton-item"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Overlays Content -->
-                    <div class="overlays-content" id="overlays-content" style="display: none;">
-                        <div class="overlays-list" id="overlays-list"></div>
-                    </div>
-
-                    <!-- Empty State -->
-                    <div class="empty-state" id="empty-state" style="display: none;">
-                        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"/>
-                            <path d="m21 21-4.35-4.35"/>
-                        </svg>
-                        <p class="empty-title">No overlays found</p>
-                        <p class="empty-subtitle" id="empty-subtitle">No overlays match your search</p>
-                        <button class="btn-clear-search" id="clear-search-btn">Clear search</button>
-                    </div>
-
-                    <!-- Instructions -->
-                    <div class="instructions-state" id="instructions-state">
-                        <div class="instructions-content">
-                            <svg class="instructions-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 4 5 4 5 4c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 11c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
-                                <path d="M9 18c-4.51 2-5-2-7-2"/>
-                            </svg>
-                            <h3>How to use GitHub Overlay Browser</h3>
-                            <div class="instructions-steps">
-                                <div class="instruction-step">
-                                    <div class="step-number">1</div>
-                                    <p>Enter a GitHub repository URL that contains Minecraft skin overlays</p>
-                                </div>
-                                <div class="instruction-step">
-                                    <div class="step-number">2</div>
-                                    <p>Repository must have an "Overlays" folder in the root directory</p>
-                                </div>
-                                <div class="instruction-step">
-                                    <div class="step-number">3</div>
-                                    <p>Each subfolder in "Overlays" represents a category (e.g., "Hats", "Accessories")</p>
-                                </div>
-                                <div class="instruction-step">
-                                    <div class="step-number">4</div>
-                                    <p>PNG files in subfolders will be available for selection</p>
-                                </div>
-                            </div>
-                            <div class="example-structure">
-                                <p><strong>Example structure:</strong><br>
-                                repository/Overlays/Hats/cool_hat.png<br>
-                                repository/Overlays/Accessories/glasses.png</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Success Message -->
-                    <div class="success-message" id="success-message" style="display: none;">
-                        <span id="success-text"></span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <p class="modal-footer-text">Default repository loaded • Browse community overlays or add your own repository</p>
-                <button class="btn-close" id="close-modal-btn">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Hidden canvas for compositing -->
-    <canvas id="composite-canvas" width="64" height="64" style="display: none;"></canvas>
-
-    <!-- Load modular JavaScript files -->
-    <script type="module" src="js/main.js"></script>
+	<footer>
+		<div class="bottom">(The site didn’t work so I decided to redo it)</div>
+	</footer>
 </body>
 </html>
