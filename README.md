@@ -139,4 +139,4 @@ If you encounter issues or have questions:
 
 ---
 
-Made with ❤️ for the Minecraft community
+Made with ❤️ for the Origin Realms community
