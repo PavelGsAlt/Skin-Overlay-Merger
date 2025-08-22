@@ -1,158 +1,161 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>404 — not here</title>
-
-	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;900&display=swap" rel="stylesheet">
-
-	<style>
-		:root {
-			--bg: #0b0f14;
-			--fg: #e6f1ff;
-			--muted: #90a4b8;
-			--accent: #7cf3ff;
-			--accent2: #ff4d7e;
-			--glass-bg: rgba(255, 255, 255, 0.06);
-			--glass-border: rgba(255, 255, 255, 0.2);
-		}
-
-		html, body {
-			height: 100%;
-		}
-		body {
-			margin: 0;
-			font-family: Inter, system-ui, sans-serif;
-			background: radial-gradient(circle at top left, #121826, #0b0f14 60%),
-			            radial-gradient(circle at bottom right, #101c2e, transparent 50%);
-			color: var(--fg);
-			display: grid;
-			grid-template-rows: auto 1fr auto;
-			min-height: 100svh;
-			overflow: hidden;
-			position: relative;
-		}
-
-		/* Blurred glowing shapes */
-		.shape {
-			position: fixed;
-			border-radius: 50%;
-			filter: blur(140px);
-			opacity: 0.5;
-			mix-blend-mode: screen;
-			z-index: -1;
-			animation: float 20s ease-in-out infinite alternate;
-		}
-		.shape1 {
-			background: var(--accent);
-			width: 500px; height: 500px;
-			top: -10%; left: -10%;
-		}
-		.shape2 {
-			background: var(--accent2);
-			width: 600px; height: 600px;
-			bottom: -15%; right: -15%;
-			animation-delay: 4s;
-		}
-		.shape3 {
-			background: #6c4dff;
-			width: 400px; height: 400px;
-			top: 50%; left: 70%;
-			animation-delay: 8s;
-		}
-		@keyframes float {
-			0% { transform: translate(0,0) scale(1); }
-			50% { transform: translate(60px, -40px) scale(1.1); }
-			100% { transform: translate(-40px, 20px) scale(1); }
-		}
-
-		header, footer {
-			text-align: center;
-			padding: 24px clamp(16px, 5vw, 48px);
-		}
-		header .top {
-			font-size: clamp(14px, 2.5vw, 18px);
-			letter-spacing: .12em;
-			text-transform: uppercase;
-			color: var(--muted);
-			opacity: .9;
-		}
-
-		main {
-			display: grid;
-			place-items: center;
-			padding: clamp(16px, 3vw, 32px);
-		}
-
-		/* Glassmorphic box */
-		.glass {
-			position: relative;
-			padding: clamp(32px, 6vw, 64px) clamp(24px, 5vw, 64px);
-			background: var(--glass-bg);
-			border: 1px solid var(--glass-border);
-			backdrop-filter: blur(20px) saturate(140%);
-			-webkit-backdrop-filter: blur(20px) saturate(140%);
-			border-radius: 24px;
-			box-shadow: 0 8px 40px rgba(0,0,0,0.4);
-			text-align: center;
-		}
-
-		.glass .glitch {
-			position: relative;
-			font-weight: 900;
-			font-size: clamp(72px, 25vw, 240px);
-			letter-spacing: .02em;
-			text-transform: uppercase;
-			color: var(--fg);
-			text-shadow:
-				0 0 10px var(--accent),
-				0 0 20px var(--accent),
-				0 0 40px var(--accent2);
-			animation: glowFlicker 3s infinite;
-			user-select: none;
-		}
-
-		/* Irregular flicker animation */
-		@keyframes glowFlicker {
-			0%   { opacity: 1;   text-shadow: 0 0 6px var(--accent), 0 0 20px var(--accent), 0 0 30px var(--accent2); }
-			10%  { opacity: 0.85;text-shadow: 0 0 2px var(--accent), 0 0 10px var(--accent2); }
-			20%  { opacity: 1;   text-shadow: 0 0 12px var(--accent), 0 0 25px var(--accent2), 0 0 50px var(--accent); }
-			35%  { opacity: 0.7; text-shadow: 0 0 4px var(--accent); }
-			50%  { opacity: 1;   text-shadow: 0 0 18px var(--accent2), 0 0 40px var(--accent); }
-			65%  { opacity: 0.9; text-shadow: 0 0 8px var(--accent), 0 0 20px var(--accent2); }
-			80%  { opacity: 1;   text-shadow: 0 0 15px var(--accent2), 0 0 35px var(--accent); }
-			90%  { opacity: 0.8; text-shadow: 0 0 6px var(--accent); }
-			100% { opacity: 1;   text-shadow: 0 0 12px var(--accent), 0 0 30px var(--accent2), 0 0 60px var(--accent); }
-		}
-
-		footer .bottom {
-			color: var(--muted);
-			font-size: clamp(12px, 2.2vw, 16px);
-		}
-
-		@media (prefers-reduced-motion: reduce) {
-			* { animation: none !important; }
-		}
-	</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minecraft Skin Overlay Merger</title>
+  <meta name="description" content="Merge your Minecraft skins with overlays using this client-side tool. No uploads needed - all processing happens in your browser.">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' fill='%2310b981'/><text x='32' y='40' font-family='Arial' font-size='24' fill='white' text-anchor='middle'>MS</text></svg>">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Minecraft Skin Overlay Merger">
+  <meta property="og:description" content="Merge your Minecraft skins with overlays using this client-side tool.">
+  <meta property="og:url" content="https://pavelgsalt.github.io/">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:title" content="Minecraft Skin Overlay Merger">
+  <meta property="twitter:description" content="Merge your Minecraft skins with overlays using this client-side tool.">
+  
+  <!-- Preload critical resources -->
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"></noscript>
+  
+  <!-- Critical CSS -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      background: #0f172a;
+      color: white;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    #root {
+      min-height: 100vh;
+    }
+    
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .spinner {
+      width: 2rem;
+      height: 2rem;
+      border: 3px solid rgba(16, 185, 129, 0.3);
+      border-radius: 50%;
+      border-top-color: #10b981;
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    
+    .error {
+      text-align: center;
+      padding: 2rem;
+      max-width: 32rem;
+      margin: 0 auto;
+    }
+    
+    .error h2 {
+      color: #ef4444;
+      margin-bottom: 1rem;
+    }
+    
+    .error p {
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+    
+    .noscript {
+      background: #dc2626;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 9999;
+    }
+  </style>
+  
+  <!-- External CSS (non-critical) -->
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./styles/globals.css">
+  <link rel="stylesheet" href="./styles/minecraft-skin.css">
+  
+  <!-- Three.js -->
+  <script src="https://unpkg.com/three@0.150.1/build/three.min.js"></script>
+  <!-- SkinView3D -->
+  <script src="https://unpkg.com/skinview3d@2.2.0/bundles/skinview3d.bundle.js"></script>
 </head>
 <body>
-	<div class="shape shape1"></div>
-	<div class="shape shape2"></div>
-	<div class="shape shape3"></div>
-
-	<header>
-		<div class="top">not here</div>
-	</header>
-
-	<main>
-		<div class="glass">
-			<div class="glitch">404</div>
-		</div>
-	</main>
-
-	<footer>
-		<div class="bottom">(The site didn’t work so I decided to redo it)</div>
-	</footer>
+  <noscript>
+    <div class="noscript">
+      <strong>JavaScript is required to run this application.</strong>
+      Please enable JavaScript in your browser to continue.
+    </div>
+  </noscript>
+  
+  <div id="root">
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Loading Minecraft Skin Overlay Merger...</p>
+    </div>
+  </div>
+  
+  <!-- Error boundary fallback -->
+  <script>
+    window.addEventListener('error', function(e) {
+      console.error('Application error:', e.error);
+      const root = document.getElementById('root');
+      if (root) {
+        root.innerHTML = `
+          <div class="error">
+            <h2>Something went wrong</h2>
+            <p>The application encountered an error. Please refresh the page to try again.</p>
+            <p style="margin-top: 1rem;"><strong>Error:</strong> ${e.error?.message || 'Unknown error'}</p>
+          </div>
+        `;
+      }
+    });
+    
+    window.addEventListener('unhandledrejection', function(e) {
+      console.error('Unhandled promise rejection:', e.reason);
+    });
+  </script>
+  
+  <!-- React and ReactDOM from CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- Babel for JSX transformation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- Lucide React -->
+  <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
+  
+  <!-- Main application script -->
+  <script type="text/babel" src="./main.js"></script>
 </body>
 </html>

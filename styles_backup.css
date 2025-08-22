@@ -32,11 +32,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  /* Global text rendering improvements to prevent blurriness */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  backface-visibility: hidden;
 }
 
 body {
@@ -72,13 +67,6 @@ h1, h2, h3, h4, h5, h6 {
 .max-w-7xl { max-width: 80rem; }
 .mx-auto { margin-left: auto; margin-right: auto; }
 
-/* Heights and widths */
-.h-32 { height: 8rem; }
-.h-4 { height: 1rem; }
-.h-6 { height: 1.5rem; }
-.w-4 { width: 1rem; }
-.w-6 { width: 1.5rem; }
-
 /* Flexbox and Grid */
 .flex { display: flex; }
 .grid { display: grid; }
@@ -109,6 +97,8 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (min-width: 1024px) {
   .lg-grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lg-grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .lg-col-span-2 { grid-column: span 2 / span 2; }
 }
 
 /* Modern Card Components */
@@ -127,12 +117,9 @@ h1, h2, h3, h4, h5, h6 {
   border-color: var(--border-secondary);
   box-shadow: var(--shadow-lg);
   transform: translateY(-2px);
-  /* Prevent text blurriness on transform */
-  -webkit-font-smoothing: subpixel-antialiased;
-  backface-visibility: hidden;
 }
 
-/* Enhanced Button Styles - Fixed text blurriness on hover */
+/* Enhanced Button Styles */
 button {
   font-family: inherit;
   font-weight: 600;
@@ -150,12 +137,6 @@ button {
   letter-spacing: 0.025em;
   position: relative;
   overflow: hidden;
-  /* Fix for text blurriness on hover */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  backface-visibility: hidden;
-  will-change: transform;
 }
 
 button:focus-visible {
@@ -180,9 +161,6 @@ button:disabled {
 .btn-default:hover:not(:disabled) {
   box-shadow: var(--shadow-glow), var(--shadow-md);
   transform: translateY(-1px) scale(1.02);
-  /* Prevent text blurriness on scale transforms */
-  transform-origin: center;
-  -webkit-font-smoothing: subpixel-antialiased;
 }
 
 .btn-outline {
@@ -264,7 +242,6 @@ button:disabled {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  margin-bottom: 1rem;
 }
 
 .upload-zone::before {
@@ -432,32 +409,7 @@ input[type="checkbox"] {
 .transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 200ms; }
 .duration-200 { transition-duration: 200ms; }
 .transform { transform: translateZ(0); }
-.hover-scale-105:hover { 
-  transform: scale(1.05);
-  /* Prevent text blurriness */
-  -webkit-font-smoothing: subpixel-antialiased;
-  backface-visibility: hidden;
-  text-rendering: optimizeLegibility;
-}
-
-/* 3D Preview Container Enhancements */
-.preview-3d-container {
-  position: relative;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(6, 182, 212, 0.05));
-  border-radius: 1rem;
-  padding: 0.5rem;
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  box-shadow: 0 8px 32px rgba(16, 185, 129, 0.1);
-}
-
-.preview-3d-canvas {
-  filter: brightness(1.05) contrast(1.05);
-  transition: filter 0.3s ease;
-}
-
-.preview-3d-canvas:hover {
-  filter: brightness(1.1) contrast(1.1);
-}
+.hover-scale-105:hover { transform: scale(1.05); }
 .active-scale-95:active { transform: scale(0.95); }
 
 /* Positioning */
@@ -468,6 +420,7 @@ input[type="checkbox"] {
 .z-50 { z-index: 50; }
 .top-half { top: 50%; }
 .left-3 { left: 0.75rem; }
+.transform { transform: translateZ(0); }
 .translate-y-neg-half { transform: translateY(-50%); }
 
 /* Overflow and display */
@@ -484,6 +437,10 @@ input[type="checkbox"] {
 /* Aspect ratio */
 .aspect-4-3 { aspect-ratio: 4/3; }
 
+/* Disabled states */
+.disabled-opacity-50:disabled { opacity: 0.5; }
+.disabled-cursor-not-allowed:disabled { cursor: not-allowed; }
+
 /* Pixelated image rendering */
 .pixelated {
   image-rendering: -moz-crisp-edges;
@@ -497,6 +454,13 @@ input[type="checkbox"] {
 
 /* Cursor */
 .cursor-pointer { cursor: pointer; }
+
+/* Modal and overlay improvements */
+.modal-overlay {
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
@@ -533,18 +497,7 @@ select:focus-visible {
   color: white;
 }
 
-/* Fix transform blurriness for all interactive elements */
-*:hover {
-  -webkit-font-smoothing: subpixel-antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-/* Prevent blurriness on scaled elements */
-*[style*="transform"], .transform {
-  -webkit-font-smoothing: subpixel-antialiased;
-  backface-visibility: hidden;
-  transform-style: preserve-3d;
-}
+/* Responsive improvements */
 @media (max-width: 768px) {
   .text-3xl { font-size: 1.5rem; line-height: 2rem; }
   .p-6 { padding: 1rem; }
@@ -706,7 +659,7 @@ body {
 .border-dashed { border-style: dashed; }
 .border-slate-600 { border-color: rgb(71 85 105); }
 .border-slate-700 { border-color: rgb(51 65 85); }
-.border-white-10 { border-color: rgb(255 255 255 / 0.1); }
+.border-white\/10 { border-color: rgb(255 255 255 / 0.1); }
 .border-emerald-500 { border-color: rgb(16 185 129); }
 .border-cyan-500 { border-color: rgb(6 182 212); }
 
@@ -719,14 +672,14 @@ body {
 .transition-colors { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
 
 /* Hover States */
-.hover-border-emerald-500:hover { border-color: rgb(16 185 129); }
-.hover-border-cyan-500:hover { border-color: rgb(6 182 212); }
-.hover-bg-emerald-600:hover { background-color: rgb(5 150 105); }
-.hover-from-emerald-600:hover { --tw-gradient-from: rgb(5 150 105); }
-.hover-to-cyan-600:hover { --tw-gradient-to: rgb(8 145 178); }
+.hover\\:border-emerald-500:hover { border-color: rgb(16 185 129); }
+.hover\\:border-cyan-500:hover { border-color: rgb(6 182 212); }
+.hover\\:bg-emerald-600:hover { background-color: rgb(5 150 105); }
+.hover\\:from-emerald-600:hover { --tw-gradient-from: rgb(5 150 105); }
+.hover\\:to-cyan-600:hover { --tw-gradient-to: rgb(8 145 178); }
 
 /* Disabled States */
-.disabled-opacity-50:disabled { opacity: 0.5; }
+.disabled\\:opacity-50:disabled { opacity: 0.5; }
 
 /* Object Fit */
 .object-contain { object-fit: contain; }
@@ -736,9 +689,9 @@ body {
 .max-h-full { max-height: 100%; }
 
 /* Custom Styles for the Application */
-.bg-white-5 { background-color: rgb(255 255 255 / 0.05); }
-.bg-black-20 { background-color: rgb(0 0 0 / 0.2); }
-.bg-slate-800-50 { background-color: rgb(30 41 59 / 0.5); }
+.bg-white\\/5 { background-color: rgb(255 255 255 / 0.05); }
+.bg-black\\/20 { background-color: rgb(0 0 0 / 0.2); }
+.bg-slate-800\\/50 { background-color: rgb(30 41 59 / 0.5); }
 
 /* Button Gradients */
 .bg-gradient-to-r {
