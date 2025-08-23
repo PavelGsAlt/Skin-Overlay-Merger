@@ -252,27 +252,38 @@ const ZipOverlayBrowser = ({ isOpen, onClose, onSelectOverlay }) => {
     onClose();
   };
 
-  return React.createElement(Modal, { isOpen, onClose, title: "Browse ZIP Overlays" },
+  return React.createElement(Modal, { isOpen, onClose, title: "Browse OR Feed Overlays" },
     React.createElement('div', { className: "space-y-4" },
       // Search and skin type selector
       React.createElement('div', { className: "flex gap-3" },
         React.createElement('div', { className: "relative flex-1" },
-          React.createElement(Search, { className: "absolute left-3 top-half transform translate-y-neg-half text-slate-400" }),
+          React.createElement(Search, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 pointer-events-none" }),
           React.createElement('input', {
             type: "text",
-            placeholder: "Search overlays...",
+            placeholder: "Search OR Feed overlays...",
             value: searchTerm,
             onChange: (e) => setSearchTerm(e.target.value),
-            className: "w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400"
+            className: "w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 outline-none transition-all"
           })
         ),
-        React.createElement('select', {
-          value: selectedSkinType,
-          onChange: (e) => setSelectedSkinType(e.target.value),
-          className: "px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white"
-        },
-          React.createElement('option', { value: 'slim' }, "Slim"),
-          React.createElement('option', { value: 'normal' }, "Normal")
+        // Switch-style skin type selector
+        React.createElement('div', { className: "flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-600 shadow-inner" },
+          React.createElement('button', {
+            onClick: () => setSelectedSkinType('slim'),
+            className: `px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 ease-out ${
+              selectedSkinType === 'slim' 
+                ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-xl transform scale-105 border border-emerald-400' 
+                : 'text-slate-300 hover:text-white hover:bg-slate-700/70 hover:transform hover:scale-102'
+            }`
+          }, "Slim"),
+          React.createElement('button', {
+            onClick: () => setSelectedSkinType('normal'),
+            className: `px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 ease-out ${
+              selectedSkinType === 'normal' 
+                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-xl transform scale-105 border border-blue-400' 
+                : 'text-slate-300 hover:text-white hover:bg-slate-700/70 hover:transform hover:scale-102'
+            }`
+          }, "Normal")
         )
       ),
       
@@ -283,29 +294,40 @@ const ZipOverlayBrowser = ({ isOpen, onClose, onSelectOverlay }) => {
         React.createElement('div', { className: "text-sm text-slate-400" }, 
           `Found ${filteredOverlays.length} overlay${filteredOverlays.length !== 1 ? 's' : ''}`
         ),
-        React.createElement('div', { className: "grid grid-cols-1 md-grid-cols-2 gap-3 max-h-96 overflow-y-auto" },
+        React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto p-2" },
           filteredOverlays.map(overlay =>
             React.createElement('div', {
               key: overlay.name,
-              className: "bg-slate-700/50 p-4 rounded-lg border border-slate-600 hover:border-cyan-500 transition-colors cursor-pointer",
+              className: "bg-slate-800/80 p-4 rounded-lg border border-slate-600 hover:border-cyan-400 hover:bg-slate-700/80 transition-all duration-200 cursor-pointer group",
               onClick: () => handleOverlaySelect(overlay)
             },
-              React.createElement('div', { className: "flex justify-between items-start mb-2" },
-                React.createElement('div', { className: "text-sm font-medium text-white" }, overlay.name),
-                React.createElement('div', { className: "flex gap-1" },
+              React.createElement('div', { className: "flex justify-between items-start mb-3" },
+                React.createElement('h4', { className: "text-sm font-semibold text-white group-hover:text-cyan-300 transition-colors" }, overlay.name),
+                React.createElement('div', { className: "flex gap-1.5" },
                   overlay.hasSlim && React.createElement('span', { 
-                    className: `text-xs px-2 py-1 rounded ${selectedSkinType === 'slim' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-600/50 text-slate-400'}` 
+                    className: `text-xs px-2 py-0.5 rounded border ${selectedSkinType === 'slim' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/50' : 'bg-slate-600/50 text-slate-400 border-slate-500/50'}` 
                   }, "Slim"),
                   overlay.hasNormal && React.createElement('span', { 
-                    className: `text-xs px-2 py-1 rounded ${selectedSkinType === 'normal' ? 'bg-blue-500/20 text-blue-300' : 'bg-slate-600/50 text-slate-400'}` 
+                    className: `text-xs px-2 py-0.5 rounded border ${selectedSkinType === 'normal' ? 'bg-blue-500/20 text-blue-300 border-blue-400/50' : 'bg-slate-600/50 text-slate-400 border-slate-500/50'}` 
                   }, "Normal")
                 )
               ),
               React.createElement('div', { className: "text-xs text-slate-400 mb-3" },
                 `${overlay.fileCount} file${overlay.fileCount !== 1 ? 's' : ''} • ${Math.round(overlay.totalSize / 1024)} KB`
               ),
-              React.createElement(Button, { variant: "cyan", size: "sm", className: "w-full" }, 
-                `Select ${selectedSkinType === 'slim' && overlay.hasSlim ? 'Slim' : selectedSkinType === 'normal' && overlay.hasNormal ? 'Normal' : 'Default'}`
+              React.createElement(Button, { 
+                variant: "cyan", 
+                size: "sm", 
+                className: "w-full text-sm py-2 font-medium bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 border-none" 
+              }, 
+                (() => {
+                  if (selectedSkinType === 'slim') {
+                    return overlay.hasSlim ? 'Select Slim' : 'Select Default';
+                  } else if (selectedSkinType === 'normal') {
+                    return overlay.hasNormal ? 'Select Normal' : 'Select Default';
+                  }
+                  return 'Select Default';
+                })()
               )
             )
           )
@@ -608,16 +630,16 @@ function App() {
 
   return React.createElement('div', { className: "min-h-screen bg-gradient-to-br from-emerald-950 via-slate-900 to-blue-950" },
     // Header
-    React.createElement('header', { className: "border-b border-white/10 bg-black/20 backdrop-blur-sm p-6" },
+    React.createElement('header', { className: "bg-black/20 backdrop-blur-sm p-6" },
       React.createElement('div', { className: "max-w-7xl mx-auto" },
         React.createElement('div', { className: "flex items-center justify-between flex-wrap gap-4" },
           React.createElement('div', null,
             React.createElement('h1', { className: "text-3xl font-bold text-white" }, "Minecraft Skin Overlay Merger"),
-            React.createElement('p', { className: "text-emerald-400 mt-2" }, "Merge skins with overlays • 3D Preview • ZIP Overlays • Browse by Name • Client-side processing")
+            React.createElement('p', { className: "text-emerald-400 mt-2" }, "Merge skins with overlays • 3D Preview • OR Feed Overlays • Browse by Name • Client-side processing")
           ),
           React.createElement('div', { className: "flex gap-2 flex-wrap" },
             React.createElement(Badge, { className: "bg-emerald-500/20 text-emerald-300" }, "✨ Enhanced"),
-            React.createElement(Badge, { className: "bg-cyan-500/20 text-cyan-300" }, "📦 ZIP Overlays"),
+            React.createElement(Badge, { className: "bg-cyan-500/20 text-cyan-300" }, "🎨 OR Feed"),
             React.createElement(Badge, { className: "bg-purple-500/20 text-purple-300" }, "🔍 Browse by Name"),
             scriptsLoaded && React.createElement(Badge, { className: "bg-green-500/20 text-green-300" }, "🎮 3D Ready")
           )
@@ -706,7 +728,11 @@ function App() {
                   size: "sm",
                   onClick: () => setShowZipBrowser(true),
                   className: "flex-1"
-                }, React.createElement(Github, { className: "mr-1" }), "Browse ZIP"),
+                }, React.createElement('img', { 
+                  src: './orf-logo.png', 
+                  alt: 'OR Feed Logo', 
+                  className: 'mr-2 w-4 h-4 object-contain'
+                }), "Browse OR Feed"),
                 skin.overlayImg && React.createElement(Button, { variant: "ghost", size: "sm", onClick: () => clearSkin('overlay') }, "Clear"),
                 skin.overlayImg && React.createElement(Button, { 
                   variant: "cyan", 
@@ -810,7 +836,18 @@ function App() {
       isOpen: showZipBrowser,
       onClose: () => setShowZipBrowser(false),
       onSelectOverlay: handleZipOverlaySelect
-    })
+    }),
+
+    // Development notice banner at bottom
+    React.createElement('div', { className: "bg-gradient-to-r from-orange-500/90 to-orange-600/90 backdrop-blur-sm text-white p-3 text-center border-t border-orange-400/20" },
+      React.createElement('div', { className: "max-w-7xl mx-auto" },
+        React.createElement('p', { className: "text-sm font-semibold" },
+          "🚧 This site is still in development! Please message ",
+          React.createElement('span', { className: "font-bold underline" }, "ph4_0"),
+          " on Discord for any issues or feedback."
+        )
+      )
+    )
   );
 }
 

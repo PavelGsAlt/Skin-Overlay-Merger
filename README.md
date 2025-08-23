@@ -148,4 +148,4 @@ If you encounter issues or have questions:
 
 ---
 
-Made with ❤️ for the Origin Realms community
+Made with ❤️ for the OR Feed Community
