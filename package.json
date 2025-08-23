@@ -1,7 +1,7 @@
 {
   "name": "pavelgsalt.github.io",
   "version": "1.0.0",
-  "description": "Minecraft Skin Overlay Merger - A client-side tool to merge Minecraft skins with overlays",
+  "description": "Minecraft Skin Overlay Merger - A client-side tool to merge Minecraft skins with overlays using ZIP file extraction",
   "main": "main.js",
   "scripts": {
     "start": "npx serve . -s",
@@ -24,6 +24,7 @@
     "client-side",
     "3d-viewer",
     "skinview3d",
+    "zip-extraction",
     "github-pages"
   ],
   "author": "PavelGsAlt",
@@ -34,8 +35,8 @@
   "homepage": "https://pavelgsalt.github.io",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.0.0",
-    "lucide-react": "^0.539.0",
-    "node-fetch": "^2.6.7"
+    "jszip": "^3.10.1",
+    "lucide-react": "^0.539.0"
   },
   "devDependencies": {
     "@types/react": "^19.1.10",

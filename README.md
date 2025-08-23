@@ -1,13 +1,15 @@
 # Minecraft Skin Overlay Merger
 
-A client-side web application for merging Minecraft skins with overlays. All processing happens in your browser - no uploads needed!
+A client-side web application for merging Minecraft skins with overlays using a simple ZIP file system. All processing happens in your browser - no uploads needed!
 
 ## ✨ Features
 
 - **Client-side Processing**: No server uploads, all processing happens in your browser
 - **Drag & Drop Support**: Easy file upload with drag and drop functionality  
 - **3D Preview**: Interactive 3D skin viewer powered by SkinView3D and Three.js
-- **GitHub Integration**: Browse community overlays from GitHub repositories
+- **ZIP Overlay System**: Browse overlays from a single ZIP file with automatic extraction
+- **Individual Preview**: Preview base skins and overlays separately in 3D
+- **Skin Type Support**: Automatic detection of slim/normal skin variants
 - **Auto-resize**: Automatically resize overlays to match base skin dimensions
 - **Download Ready**: Instant download of merged skins
 
@@ -58,14 +60,14 @@ npm run dev
 ```
 ├── index.html          # Main HTML file
 ├── main.js             # React application entry point
+├── overlay-config.js   # ZIP overlay configuration
+├── overlay-service.js  # ZIP extraction and overlay service
 ├── styles.css          # Main stylesheet
 ├── styles/
 │   ├── globals.css     # Global styles
 │   └── minecraft-skin.css # Minecraft-specific styles
-├── netlify/
-│   └── functions/
-│       └── github-proxy.js # GitHub API proxy for CORS
-└── Overlays/           # Sample overlay files
+├── Overlays.zip        # ZIP file containing all overlays
+└── OVERLAYS-ZIP-STRUCTURE.md # ZIP structure guide
 ```
 
 ## 🎨 Technologies Used
@@ -73,36 +75,42 @@ npm run dev
 - **React 18** (via CDN)
 - **Three.js** - 3D graphics library
 - **SkinView3D** - Minecraft skin 3D viewer
-- **Netlify Functions** - Serverless backend for GitHub API
-- **Vanilla CSS** - Custom styling with Tailwind-inspired utilities
+- **JSZip** - Client-side ZIP file extraction
+- **Vanilla CSS** - Custom styling with modern utilities
 
 ## 🔧 Configuration
 
-### GitHub Integration
+### ZIP Overlay System
 
-The app can browse overlays from GitHub repositories. To add your own repository:
+The app uses a simple ZIP file system for overlays. See [OVERLAYS-ZIP-STRUCTURE.md](OVERLAYS-ZIP-STRUCTURE.md) for detailed structure requirements.
 
-1. Create an `Overlays` folder in your repository root
-2. Add subfolders for different overlay categories
-3. Place PNG files in the subfolders
-4. The app will automatically detect and display them
+Quick setup:
+1. Create overlay folders with PNG files for each overlay
+2. Structure folders with `slim.png` and `normal.png` for each overlay
+3. ZIP all overlay folders into `Overlays.zip`
+4. Place `Overlays.zip` in your website root directory
 
-Example structure:
+Example ZIP structure:
 ```
-your-repo/
-└── Overlays/
-    ├── Hats/
-    │   ├── cool_hat.png
-    │   └── winter_hat.png
-    └── Accessories/
-        ├── glasses.png
-        └── necklace.png
+Overlays.zip
+├── wizard_hat/
+│   ├── slim.png
+│   └── normal.png
+├── cool_glasses/
+│   ├── slim.png
+│   └── normal.png
+└── red_cape/
+    ├── slim.png
+    └── normal.png
 ```
 
-### Netlify Functions
+### File Requirements
 
-For GitHub API integration, configure environment variables:
-- `GITHUB_TOKEN` (optional) - GitHub personal access token for higher rate limits
+- **ZIP file**: Must be named `Overlays.zip` in website root
+- **Structure**: Each overlay in its own folder
+- **Files**: `slim.png` and `normal.png` for each overlay
+- **Format**: PNG files only, max 10MB per file
+- **Total size**: Max 100MB for entire ZIP file
 
 ## 🤝 Contributing
 
@@ -127,7 +135,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Large overlay files may take a moment to process
 - 3D viewer requires WebGL support
-- GitHub API has rate limits for unauthenticated requests
+- ZIP file must be accessible from website root
+- Large ZIP files (>50MB) may take time to download and extract
 
 ## 📞 Support
 

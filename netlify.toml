@@ -1,3 +1,0 @@
-[build]
-  publish = "."        # Static site root
-  functions = "netlify/functions"

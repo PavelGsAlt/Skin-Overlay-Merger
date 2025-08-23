@@ -164,96 +164,156 @@ const SkinNameBrowser = ({ isOpen, onClose, onSelectSkin }) => {
   );
 };
 
-// Working GitHub Overlay Browser
-const GitHubOverlayBrowser = ({ isOpen, onClose, onSelectOverlay }) => {
+// ZIP Overlay Browser
+const ZipOverlayBrowser = ({ isOpen, onClose, onSelectOverlay }) => {
   const [overlays, setOverlays] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSkinType, setSelectedSkinType] = useState('slim');
+  const overlayServiceRef = useRef(null);
 
   const fetchOverlays = async () => {
     setLoading(true);
     setError('');
     
-    // Show demo overlays immediately for local development
-    const demoOverlays = [
-      { name: "Hats/wizard_hat.png", url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==", size: 2048, folder: "Hats", filename: "wizard_hat.png" },
-      { name: "Hats/crown.png", url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==", size: 1536, folder: "Hats", filename: "crown.png" },
-      { name: "Hats/cap.png", url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==", size: 1280, folder: "Hats", filename: "cap.png" },
-      { name: "Accessories/glasses.png", url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==", size: 1280, folder: "Accessories", filename: "glasses.png" },
-      { name: "Accessories/watch.png", url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==", size: 896, folder: "Accessories", filename: "watch.png" },
-      { name: "Capes/red_cape.png", url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==", size: 4096, folder: "Capes", filename: "red_cape.png" },
-      { name: "Capes/blue_cape.png", url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==", size: 3584, folder: "Capes", filename: "blue_cape.png" }
-    ];
-    
-    setTimeout(() => {
+    try {
+      if (!overlayServiceRef.current) {
+        overlayServiceRef.current = new OverlayService();
+      }
+      
+      const extractedOverlays = await overlayServiceRef.current.fetchOverlays();
+      setOverlays(extractedOverlays);
+      
+      if (extractedOverlays.length === 0) {
+        setError('📦 No overlays found in ZIP file. Make sure your Overlays.zip contains folders with PNG files.');
+      }
+      
+    } catch (err) {
+      console.error('Failed to fetch overlays:', err);
+      setError(`❌ Failed to load overlays: ${err.message}. Make sure Overlays.zip is available and properly formatted.`);
+      
+      // Show demo overlays as fallback
+      const demoOverlays = [
+        {
+          name: "wizard_hat",
+          folder: "Overlays",
+          hasSlim: true,
+          hasNormal: true,
+          fileCount: 2,
+          defaultUrl: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==",
+          urls: new Map([['slim.png', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=='], ['normal.png', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==']])
+        },
+        {
+          name: "cool_glasses",
+          folder: "Overlays",
+          hasSlim: true,
+          hasNormal: false,
+          fileCount: 1,
+          defaultUrl: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==",
+          urls: new Map([['slim.png', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==']])
+        }
+      ];
       setOverlays(demoOverlays);
-      setError('🔧 Demo Mode: Showing sample overlays. Deploy to GitHub/Netlify for real overlays.');
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   useEffect(() => {
-    if (isOpen) fetchOverlays();
+    if (isOpen) {
+      fetchOverlays();
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      if (overlayServiceRef.current) {
+        overlayServiceRef.current.cleanup();
+      }
+    };
   }, [isOpen]);
 
-  const groupedOverlays = overlays.reduce((groups, overlay) => {
-    const folder = overlay.folder || overlay.name.split('/')[0];
-    if (!groups[folder]) groups[folder] = [];
-    groups[folder].push(overlay);
-    return groups;
-  }, {});
-
-  const filteredGroups = Object.entries(groupedOverlays).filter(([folder, items]) => {
+  const filteredOverlays = overlays.filter(overlay => {
     if (!searchTerm) return true;
-    return folder.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           items.some(item => (item.filename || item.name).toLowerCase().includes(searchTerm.toLowerCase()));
+    return overlay.name.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
-  return React.createElement(Modal, { isOpen, onClose, title: "Browse GitHub Overlays" },
+  const handleOverlaySelect = (overlay) => {
+    let selectedUrl = overlay.defaultUrl;
+    
+    // Try to get the preferred skin type
+    if (selectedSkinType === 'slim' && overlay.hasSlim) {
+      selectedUrl = overlay.urls.get('slim.png');
+    } else if (selectedSkinType === 'normal' && overlay.hasNormal) {
+      selectedUrl = overlay.urls.get('normal.png');
+    }
+    
+    onSelectOverlay(selectedUrl, overlay.name);
+    onClose();
+  };
+
+  return React.createElement(Modal, { isOpen, onClose, title: "Browse ZIP Overlays" },
     React.createElement('div', { className: "space-y-4" },
-      React.createElement('div', { className: "relative" },
-        React.createElement(Search, { className: "absolute left-3 top-half transform translate-y-neg-half text-slate-400" }),
-        React.createElement('input', {
-          type: "text",
-          placeholder: "Search overlays...",
-          value: searchTerm,
-          onChange: (e) => setSearchTerm(e.target.value),
-          className: "w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400"
-        })
+      // Search and skin type selector
+      React.createElement('div', { className: "flex gap-3" },
+        React.createElement('div', { className: "relative flex-1" },
+          React.createElement(Search, { className: "absolute left-3 top-half transform translate-y-neg-half text-slate-400" }),
+          React.createElement('input', {
+            type: "text",
+            placeholder: "Search overlays...",
+            value: searchTerm,
+            onChange: (e) => setSearchTerm(e.target.value),
+            className: "w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400"
+          })
+        ),
+        React.createElement('select', {
+          value: selectedSkinType,
+          onChange: (e) => setSelectedSkinType(e.target.value),
+          className: "px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white"
+        },
+          React.createElement('option', { value: 'slim' }, "Slim"),
+          React.createElement('option', { value: 'normal' }, "Normal")
+        )
       ),
       
-      loading && React.createElement('div', { className: "text-center py-8 text-emerald-400" }, "Loading overlays..."),
+      loading && React.createElement('div', { className: "text-center py-8 text-emerald-400" }, "📦 Extracting overlays from ZIP file..."),
       error && React.createElement('div', { className: "text-yellow-400 bg-yellow-500/10 p-4 rounded-lg text-sm" }, error),
       
-      !loading && filteredGroups.length > 0 && React.createElement('div', { className: "space-y-6" },
-        filteredGroups.map(([folder, items]) =>
-          React.createElement('div', { key: folder, className: "space-y-3" },
-            React.createElement('h3', { className: "text-lg font-semibold text-white" }, folder, " (", items.length, " files)"),
-            React.createElement('div', { className: "grid grid-cols-2 md-grid-cols-3 gap-3" },
-              items.filter(item => !searchTerm || 
-                (item.filename || item.name).toLowerCase().includes(searchTerm.toLowerCase())
-              ).map(overlay =>
-                React.createElement('div', {
-                  key: overlay.url,
-                  className: "bg-slate-700/50 p-3 rounded-lg border border-slate-600 hover:border-cyan-500 transition-colors cursor-pointer",
-                  onClick: () => {
-                    onSelectOverlay(overlay.url);
-                    onClose();
-                  }
-                },
-                  React.createElement('div', { className: "text-sm font-medium text-white truncate" },
-                    (overlay.filename || overlay.name).split('/').pop()
-                  ),
-                  React.createElement('div', { className: "text-xs text-slate-400 mt-1" },
-                    Math.round(overlay.size / 1024), " KB"
-                  ),
-                  React.createElement(Button, { variant: "cyan", size: "sm", className: "w-full mt-2" }, "Select")
+      !loading && filteredOverlays.length > 0 && React.createElement('div', { className: "space-y-4" },
+        React.createElement('div', { className: "text-sm text-slate-400" }, 
+          `Found ${filteredOverlays.length} overlay${filteredOverlays.length !== 1 ? 's' : ''}`
+        ),
+        React.createElement('div', { className: "grid grid-cols-1 md-grid-cols-2 gap-3 max-h-96 overflow-y-auto" },
+          filteredOverlays.map(overlay =>
+            React.createElement('div', {
+              key: overlay.name,
+              className: "bg-slate-700/50 p-4 rounded-lg border border-slate-600 hover:border-cyan-500 transition-colors cursor-pointer",
+              onClick: () => handleOverlaySelect(overlay)
+            },
+              React.createElement('div', { className: "flex justify-between items-start mb-2" },
+                React.createElement('div', { className: "text-sm font-medium text-white" }, overlay.name),
+                React.createElement('div', { className: "flex gap-1" },
+                  overlay.hasSlim && React.createElement('span', { 
+                    className: `text-xs px-2 py-1 rounded ${selectedSkinType === 'slim' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-600/50 text-slate-400'}` 
+                  }, "Slim"),
+                  overlay.hasNormal && React.createElement('span', { 
+                    className: `text-xs px-2 py-1 rounded ${selectedSkinType === 'normal' ? 'bg-blue-500/20 text-blue-300' : 'bg-slate-600/50 text-slate-400'}` 
+                  }, "Normal")
                 )
+              ),
+              React.createElement('div', { className: "text-xs text-slate-400 mb-3" },
+                `${overlay.fileCount} file${overlay.fileCount !== 1 ? 's' : ''} • ${Math.round(overlay.totalSize / 1024)} KB`
+              ),
+              React.createElement(Button, { variant: "cyan", size: "sm", className: "w-full" }, 
+                `Select ${selectedSkinType === 'slim' && overlay.hasSlim ? 'Slim' : selectedSkinType === 'normal' && overlay.hasNormal ? 'Normal' : 'Default'}`
               )
             )
           )
         )
+      ),
+      
+      !loading && filteredOverlays.length === 0 && !error && React.createElement('div', { className: "text-center py-8 text-slate-400" },
+        "No overlays found matching your search."
       )
     )
   );
@@ -345,11 +405,11 @@ const SkinViewer3D = ({ skinUrl, isVisible, onStatusChange, viewMode = 'merged' 
 
 // Main App
 function App() {
-  const [skin, setSkin] = useState({ baseImg: null, overlayImg: null, baseName: 'base', overlayFromGitHub: false });
+  const [skin, setSkin] = useState({ baseImg: null, overlayImg: null, baseName: 'base', overlayFromZip: false });
   const [errors, setErrors] = useState({ base: '', overlay: '' });
   const [isProcessing, setIsProcessing] = useState(false);
   const [scriptsLoaded, setScriptsLoaded] = useState(false);
-  const [showGitHubBrowser, setShowGitHubBrowser] = useState(false);
+  const [showZipBrowser, setShowZipBrowser] = useState(false);
   const [showSkinNameBrowser, setShowSkinNameBrowser] = useState(false);
   const [preview3D, setPreview3D] = useState({ show: false, url: '', status: 'Ready to preview', mode: 'merged' });
   const [options, setOptions] = useState({ autoResize: false, preserveFilename: true });
@@ -413,7 +473,7 @@ function App() {
         ...prev, 
         [type + 'Img']: img,
         baseName: type === 'base' ? file.name.replace(/\.png$/i, '') : prev.baseName,
-        overlayFromGitHub: type === 'overlay' ? false : prev.overlayFromGitHub
+        overlayFromZip: type === 'overlay' ? false : prev.overlayFromZip
       }));
     } catch (err) {
       setErrors(prev => ({ ...prev, [type]: err.message }));
@@ -438,7 +498,7 @@ function App() {
         ...prev, 
         baseImg: img, 
         baseName: `${username}-skin`,
-        overlayFromGitHub: false 
+        overlayFromZip: false 
       }));
       
     } catch (err) {
@@ -448,22 +508,23 @@ function App() {
     }
   };
 
-  const handleGitHubOverlaySelect = async (overlayUrl) => {
+  const handleZipOverlaySelect = async (overlayUrl, overlayName) => {
     setIsProcessing(true);
     setErrors(prev => ({ ...prev, overlay: '' }));
     
     try {
-      const response = await fetch(overlayUrl, { mode: 'cors' });
-      if (!response.ok) throw new Error('Failed to fetch overlay from GitHub');
+      // Create a response-like object from the blob URL
+      const response = await fetch(overlayUrl);
+      if (!response.ok) throw new Error('Failed to fetch overlay from ZIP');
       
       const blob = await response.blob();
-      const file = new File([blob], 'github-overlay.png', { type: 'image/png' });
+      const file = new File([blob], `${overlayName}.png`, { type: 'image/png' });
       const img = await fileToImage(file);
       
-      setSkin(prev => ({ ...prev, overlayImg: img, overlayFromGitHub: true }));
+      setSkin(prev => ({ ...prev, overlayImg: img, overlayFromZip: true }));
       
     } catch (err) {
-      setErrors(prev => ({ ...prev, overlay: `Failed to load GitHub overlay: ${err.message}` }));
+      setErrors(prev => ({ ...prev, overlay: `Failed to load ZIP overlay: ${err.message}` }));
     } finally {
       setIsProcessing(false);
     }
@@ -538,7 +599,7 @@ function App() {
       setErrors(prev => ({ ...prev, base: '' }));
       if (baseFileInputRef.current) baseFileInputRef.current.value = '';
     } else {
-      setSkin(prev => ({ ...prev, overlayImg: null, overlayFromGitHub: false }));
+      setSkin(prev => ({ ...prev, overlayImg: null, overlayFromZip: false }));
       setErrors(prev => ({ ...prev, overlay: '' }));
       if (overlayFileInputRef.current) overlayFileInputRef.current.value = '';
     }
@@ -552,11 +613,11 @@ function App() {
         React.createElement('div', { className: "flex items-center justify-between flex-wrap gap-4" },
           React.createElement('div', null,
             React.createElement('h1', { className: "text-3xl font-bold text-white" }, "Minecraft Skin Overlay Merger"),
-            React.createElement('p', { className: "text-emerald-400 mt-2" }, "Merge skins with overlays • 3D Preview • GitHub Browser • Browse by Name • Client-side processing")
+            React.createElement('p', { className: "text-emerald-400 mt-2" }, "Merge skins with overlays • 3D Preview • ZIP Overlays • Browse by Name • Client-side processing")
           ),
           React.createElement('div', { className: "flex gap-2 flex-wrap" },
             React.createElement(Badge, { className: "bg-emerald-500/20 text-emerald-300" }, "✨ Enhanced"),
-            React.createElement(Badge, { className: "bg-cyan-500/20 text-cyan-300" }, "👀 GitHub Browser"),
+            React.createElement(Badge, { className: "bg-cyan-500/20 text-cyan-300" }, "📦 ZIP Overlays"),
             React.createElement(Badge, { className: "bg-purple-500/20 text-purple-300" }, "🔍 Browse by Name"),
             scriptsLoaded && React.createElement(Badge, { className: "bg-green-500/20 text-green-300" }, "🎮 3D Ready")
           )
@@ -621,7 +682,7 @@ function App() {
             React.createElement(Card, { className: "bg-white/5" },
               React.createElement('div', { className: "flex items-center justify-between mb-4" },
                 React.createElement('h3', { className: "text-xl font-semibold text-white" }, "Overlay"),
-                skin.overlayFromGitHub && React.createElement(Badge, { className: "bg-cyan-500/20 text-cyan-300" }, "GitHub")
+                skin.overlayFromZip && React.createElement(Badge, { className: "bg-cyan-500/20 text-cyan-300" }, "ZIP")
               ),
               React.createElement('div', {
                 className: "upload-zone",
@@ -643,9 +704,9 @@ function App() {
                 React.createElement(Button, {
                   variant: "cyan",
                   size: "sm",
-                  onClick: () => setShowGitHubBrowser(true),
+                  onClick: () => setShowZipBrowser(true),
                   className: "flex-1"
-                }, React.createElement(Github, { className: "mr-1" }), "Browse GitHub"),
+                }, React.createElement(Github, { className: "mr-1" }), "Browse ZIP"),
                 skin.overlayImg && React.createElement(Button, { variant: "ghost", size: "sm", onClick: () => clearSkin('overlay') }, "Clear"),
                 skin.overlayImg && React.createElement(Button, { 
                   variant: "cyan", 
@@ -656,7 +717,7 @@ function App() {
               
               errors.overlay && React.createElement('div', { className: "text-red-400 text-sm mb-2" }, errors.overlay),
               skin.overlayImg && React.createElement('div', { className: "text-cyan-400 text-sm" }, 
-                `Overlay loaded • ${skin.overlayImg.width}×${skin.overlayImg.height}${skin.overlayFromGitHub ? ' • from GitHub' : ''}`
+                `Overlay loaded • ${skin.overlayImg.width}×${skin.overlayImg.height}${skin.overlayFromZip ? ' • from ZIP' : ''}`
               ),
               React.createElement('input', { 
                 ref: overlayFileInputRef, 
@@ -744,11 +805,11 @@ function App() {
       onSelectSkin: handleSkinNameSelect
     }),
 
-    // GitHub Browser Modal
-    React.createElement(GitHubOverlayBrowser, {
-      isOpen: showGitHubBrowser,
-      onClose: () => setShowGitHubBrowser(false),
-      onSelectOverlay: handleGitHubOverlaySelect
+    // ZIP Overlay Browser Modal
+    React.createElement(ZipOverlayBrowser, {
+      isOpen: showZipBrowser,
+      onClose: () => setShowZipBrowser(false),
+      onSelectOverlay: handleZipOverlaySelect
     })
   );
 }
