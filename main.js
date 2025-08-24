@@ -47,11 +47,19 @@ const Modal = ({ isOpen, onClose, children, title }) => {
 // Icons
 const Upload = ({ className = "" }) => React.createElement('svg', {
   className: `w-6 h-6 ${className}`, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2"
-}, React.createElement('path', { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" }));
+}, 
+  React.createElement('path', { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" }),
+  React.createElement('polyline', { points: "17,6 12,1 7,6" }),
+  React.createElement('line', { x1: "12", y1: "1", x2: "12", y2: "15" })
+);
 
 const Download = ({ className = "" }) => React.createElement('svg', {
   className: `w-4 h-4 ${className}`, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2"
-}, React.createElement('path', { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" }));
+}, 
+  React.createElement('path', { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" }),
+  React.createElement('polyline', { points: "7,10 12,15 17,10" }),
+  React.createElement('line', { x1: "12", y1: "15", x2: "12", y2: "3" })
+);
 
 const Github = ({ className = "" }) => React.createElement('svg', {
   className: `w-4 h-4 ${className}`, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2"
@@ -59,7 +67,8 @@ const Github = ({ className = "" }) => React.createElement('svg', {
 
 const Eye = ({ className = "" }) => React.createElement('svg', {
   className: `w-4 h-4 ${className}`, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2"
-}, React.createElement('path', { d: "M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" }));
+}, React.createElement('path', { d: "M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" }),
+   React.createElement('circle', { cx: "12", cy: "12", r: "3" }));
 
 const Play = ({ className = "" }) => React.createElement('svg', {
   className: `w-4 h-4 ${className}`, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2"
@@ -67,7 +76,10 @@ const Play = ({ className = "" }) => React.createElement('svg', {
 
 const Search = ({ className = "" }) => React.createElement('svg', {
   className: `w-4 h-4 ${className}`, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2"
-}, React.createElement('circle', { cx: "11", cy: "11", r: "8" }));
+}, 
+  React.createElement('circle', { cx: "11", cy: "11", r: "8" }),
+  React.createElement('path', { d: "m21 21-4.35-4.35" })
+);
 
 // Skin Name Browser
 const SkinNameBrowser = ({ isOpen, onClose, onSelectSkin }) => {
@@ -121,12 +133,13 @@ const SkinNameBrowser = ({ isOpen, onClose, onSelectSkin }) => {
       React.createElement('form', { onSubmit: handleSubmit, className: "space-y-4" },
         React.createElement('div', null,
           React.createElement('label', { className: "block text-sm font-medium text-white mb-2" }, "Minecraft Username:"),
+          // Animated search input by Tiago Augusto (tiagoadag1203) - MIT License
           React.createElement('input', {
             type: "text",
             value: username,
             onChange: (e) => setUsername(e.target.value),
             placeholder: "Enter Minecraft username...",
-            className: "w-full px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-emerald-500 focus:outline-none transition-all",
+            className: "animated-search-input",
             disabled: loading
           })
         ),
@@ -255,33 +268,33 @@ const ZipOverlayBrowser = ({ isOpen, onClose, onSelectOverlay }) => {
   return React.createElement(Modal, { isOpen, onClose, title: "Browse OR Feed Overlays" },
     React.createElement('div', { className: "space-y-4" },
       // Search and skin type selector
-      React.createElement('div', { className: "flex gap-3" },
+      React.createElement('div', { className: "flex gap-6 items-center" },
         React.createElement('div', { className: "relative flex-1" },
-          React.createElement(Search, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 pointer-events-none" }),
+          // Animated search input by Tiago Augusto (tiagoadag1203) - MIT License
           React.createElement('input', {
             type: "text",
             placeholder: "Search OR Feed overlays...",
             value: searchTerm,
             onChange: (e) => setSearchTerm(e.target.value),
-            className: "w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 outline-none transition-all"
+            className: "animated-search-input"
           })
         ),
-        // Switch-style skin type selector
-        React.createElement('div', { className: "flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-600 shadow-inner" },
+        // Enhanced switch-style skin type selector
+        React.createElement('div', { className: "flex items-center bg-slate-800/40 p-1 rounded-xl border border-slate-600/30 shadow-lg" },
           React.createElement('button', {
             onClick: () => setSelectedSkinType('slim'),
-            className: `px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 ease-out ${
+            className: `px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ease-out ${
               selectedSkinType === 'slim' 
-                ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-xl transform scale-105 border border-emerald-400' 
-                : 'text-slate-300 hover:text-white hover:bg-slate-700/70 hover:transform hover:scale-102'
+                ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-md' 
+                : 'text-slate-400 hover:text-white hover:bg-slate-700/30'
             }`
           }, "Slim"),
           React.createElement('button', {
             onClick: () => setSelectedSkinType('normal'),
-            className: `px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 ease-out ${
+            className: `px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ease-out ${
               selectedSkinType === 'normal' 
-                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-xl transform scale-105 border border-blue-400' 
-                : 'text-slate-300 hover:text-white hover:bg-slate-700/70 hover:transform hover:scale-102'
+                ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-md' 
+                : 'text-slate-400 hover:text-white hover:bg-slate-700/30'
             }`
           }, "Normal")
         )
@@ -305,10 +318,18 @@ const ZipOverlayBrowser = ({ isOpen, onClose, onSelectOverlay }) => {
                 React.createElement('h4', { className: "text-sm font-semibold text-white group-hover:text-cyan-300 transition-colors" }, overlay.name),
                 React.createElement('div', { className: "flex gap-1.5" },
                   overlay.hasSlim && React.createElement('span', { 
-                    className: `text-xs px-2 py-0.5 rounded border ${selectedSkinType === 'slim' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/50' : 'bg-slate-600/50 text-slate-400 border-slate-500/50'}` 
+                    className: `text-xs px-2 py-0.5 rounded border ${
+                      selectedSkinType === 'slim' 
+                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/50' 
+                        : 'bg-slate-700/50 text-slate-400 border-slate-600/50'
+                    }` 
                   }, "Slim"),
                   overlay.hasNormal && React.createElement('span', { 
-                    className: `text-xs px-2 py-0.5 rounded border ${selectedSkinType === 'normal' ? 'bg-blue-500/20 text-blue-300 border-blue-400/50' : 'bg-slate-600/50 text-slate-400 border-slate-500/50'}` 
+                    className: `text-xs px-2 py-0.5 rounded border ${
+                      selectedSkinType === 'normal' 
+                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/50' 
+                        : 'bg-slate-700/50 text-slate-400 border-slate-600/50'
+                    }` 
                   }, "Normal")
                 )
               ),
@@ -342,7 +363,7 @@ const ZipOverlayBrowser = ({ isOpen, onClose, onSelectOverlay }) => {
 };
 
 // Enhanced 3D Viewer Component with bigger size and better controls
-const SkinViewer3D = ({ skinUrl, isVisible, onStatusChange, viewMode = 'merged' }) => {
+const SkinViewer3D = ({ skinUrl, isVisible, onStatusChange, viewMode = 'merged', backgroundOptions }) => {
   const canvasRef = useRef(null);
   const viewerRef = useRef(null);
   
@@ -371,10 +392,49 @@ const SkinViewer3D = ({ skinUrl, isVisible, onStatusChange, viewMode = 'merged' 
       // Enhanced canvas size for better viewing
       const viewer = new SkinViewer({
         canvas: canvasRef.current,
-        width: 600, // Increased from 400
-        height: 450, // Increased from 300
+        width: 700, // Increased from 600
+        height: 525, // Increased from 450
         skin: skinUrl
       });
+      
+      // Apply background based on options
+      if (backgroundOptions && viewer.scene) {
+        if (backgroundOptions.type === 'panorama' && backgroundOptions.panorama) {
+          // Load panorama texture
+          const loader = new window.THREE.TextureLoader();
+          loader.load(backgroundOptions.panorama, (texture) => {
+            texture.mapping = window.THREE.EquirectangularReflectionMapping;
+            viewer.scene.background = texture;
+          }, undefined, (error) => {
+            console.error('Failed to load panorama:', error);
+            // Fallback to default background
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 256);
+            gradient.addColorStop(0, '#1a1f36');
+            gradient.addColorStop(1, '#0d1421');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 256, 256);
+            const fallbackTexture = new window.THREE.CanvasTexture(canvas);
+            viewer.scene.background = fallbackTexture;
+          });
+        } else {
+          // Default gradient background
+          const canvas = document.createElement('canvas');
+          canvas.width = 256;
+          canvas.height = 256;
+          const ctx = canvas.getContext('2d');
+          const gradient = ctx.createLinearGradient(0, 0, 0, 256);
+          gradient.addColorStop(0, backgroundOptions.gradient?.from || '#1a1f36');
+          gradient.addColorStop(1, backgroundOptions.gradient?.to || '#0d1421');
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, 256, 256);
+          const texture = new window.THREE.CanvasTexture(canvas);
+          viewer.scene.background = texture;
+        }
+      }
       
       // Enhanced camera settings for better zoom and positioning
       viewer.zoom = 0.25; // Lower zoom for even better overview
@@ -410,7 +470,7 @@ const SkinViewer3D = ({ skinUrl, isVisible, onStatusChange, viewMode = 'merged' 
         viewerRef.current = null;
       }
     };
-  }, [skinUrl, isVisible, viewMode]);
+  }, [skinUrl, isVisible, viewMode, backgroundOptions]);
   
   if (!isVisible) return null;
   
@@ -418,8 +478,63 @@ const SkinViewer3D = ({ skinUrl, isVisible, onStatusChange, viewMode = 'merged' 
     React.createElement('canvas', {
       ref: canvasRef,
       className: "w-full rounded-lg bg-slate-800/50 border border-slate-600 preview-3d-canvas",
-      style: { aspectRatio: '4/3', minHeight: '400px', maxHeight: '500px' } // Increased size
+      style: { aspectRatio: '4/3', minHeight: '450px', maxHeight: '600px' } // Updated for larger size
     })
+  );
+};
+
+// Background Options Component - Panorama Only
+const BackgroundOptions = ({ backgroundOptions, onBackgroundChange }) => {
+  const handlePanoramaUpload = async (files) => {
+    const file = files?.[0];
+    if (!file) return;
+
+    if (!file.type.includes('image')) {
+      alert('Please select an image file for the panorama.');
+      return;
+    }
+
+    try {
+      const reader = new FileReader();
+      reader.onload = () => {
+        onBackgroundChange({ 
+          ...backgroundOptions, 
+          type: 'panorama', 
+          panorama: reader.result,
+          panoramaFileName: file.name
+        });
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      alert('Failed to load panorama image.');
+    }
+  };
+
+  return React.createElement('div', { className: "space-y-3" },
+    React.createElement('h4', { className: "text-sm font-medium text-white" }, "Background:"),
+    
+    // Panorama upload only
+    React.createElement('div', { className: "space-y-2" },
+      React.createElement('label', { className: "text-xs text-slate-400" }, "Custom Panorama:"),
+      React.createElement('div', { className: "flex gap-2" },
+        React.createElement('input', {
+          type: "file",
+          accept: "image/*",
+          onChange: (e) => handlePanoramaUpload(e.target.files),
+          className: "hidden",
+          id: "panorama-upload"
+        }),
+        React.createElement('label', {
+          htmlFor: "panorama-upload",
+          className: "flex-1 px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-md text-xs text-slate-300 hover:bg-slate-600/50 hover:border-slate-500 cursor-pointer transition-all text-center"
+        }, backgroundOptions.type === 'panorama' ? `Panorama Loaded • ${backgroundOptions.panoramaFileName || 'Unknown file'}` : "Upload Panorama"),
+        backgroundOptions.panorama && React.createElement('button', {
+          onClick: () => onBackgroundChange({ ...backgroundOptions, type: 'gradient', gradient: { from: '#1a1f36', to: '#0d1421' }, panorama: null, panoramaFileName: null }),
+          className: "px-2 py-2 bg-slate-700/50 border border-slate-600 rounded-md text-xs text-slate-300 hover:bg-red-600/20 hover:border-red-500 transition-all",
+          title: "Remove panorama"
+        }, "✕")
+      )
+    )
   );
 };
 
@@ -434,6 +549,12 @@ function App() {
   const [showZipBrowser, setShowZipBrowser] = useState(false);
   const [showSkinNameBrowser, setShowSkinNameBrowser] = useState(false);
   const [preview3D, setPreview3D] = useState({ show: false, url: '', status: 'Ready to preview', mode: 'merged' });
+  const [backgroundOptions, setBackgroundOptions] = useState({ 
+    type: 'gradient', 
+    gradient: { from: '#1a1f36', to: '#0d1421' },
+    panorama: null,
+    panoramaFileName: null
+  });
   const [options, setOptions] = useState({ autoResize: false, preserveFilename: true });
   
   const canvasRef = useRef(null);
@@ -582,6 +703,19 @@ function App() {
     return canvas;
   };
 
+  // Helper function for auto-scroll to preview
+  const scrollToPreview = () => {
+    setTimeout(() => {
+      const previewElement = document.querySelector('.preview-3d-container');
+      if (previewElement) {
+        previewElement.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }
+    }, 100); // Small delay to ensure the preview is rendered
+  };
+
   const handlePreview3D = () => {
     if (!skin.baseImg || !skin.overlayImg) {
       setErrors({ base: 'Please load both base skin and overlay.', overlay: '' });
@@ -593,6 +727,7 @@ function App() {
     
     const mergedDataUrl = canvas.toDataURL('image/png');
     setPreview3D({ show: true, url: mergedDataUrl, status: 'Loading merged 3D preview...', mode: 'merged' });
+    scrollToPreview();
   };
 
   const handleMergeDownload = () => {
@@ -628,7 +763,7 @@ function App() {
     setPreview3D({ show: false, url: '', status: 'Ready to preview', mode: 'merged' });
   };
 
-  return React.createElement('div', { className: "min-h-screen bg-gradient-to-br from-emerald-950 via-slate-900 to-blue-950" },
+  return React.createElement('div', { className: "min-h-screen bg-gradient-to-br from-emerald-950 via-slate-900 to-blue-950 app-container" },
     // Header
     React.createElement('header', { className: "bg-black/20 backdrop-blur-sm p-6" },
       React.createElement('div', { className: "max-w-7xl mx-auto" },
@@ -649,9 +784,9 @@ function App() {
 
     // Main content
     React.createElement('div', { className: "max-w-7xl mx-auto p-6" },
-      React.createElement('div', { className: "grid grid-cols-1 lg-grid-cols-3 gap-6" },
-        // Left column - Upload areas and controls
-        React.createElement('div', { className: "lg-col-span-2 space-y-6" },
+      React.createElement('div', { className: "grid grid-cols-1 xl:grid-cols-4 gap-6" },
+        // Left column - Upload areas and controls (spans 2 columns)
+        React.createElement('div', { className: "xl:col-span-2 space-y-6" },
           React.createElement('div', { className: "grid grid-cols-1 lg-grid-cols-2 gap-6" },
             // Base skin upload
             React.createElement(Card, { className: "bg-white/5" },
@@ -683,7 +818,10 @@ function App() {
                 skin.baseImg && React.createElement(Button, { 
                   variant: "outline", 
                   size: "sm", 
-                  onClick: () => setPreview3D({ show: true, url: skin.baseImg.src, status: 'Loading base skin...', mode: 'base' })
+                  onClick: () => {
+                    setPreview3D({ show: true, url: skin.baseImg.src, status: 'Loading base skin...', mode: 'base' });
+                    scrollToPreview();
+                  }
                 }, React.createElement(Eye, { className: "mr-1" }), "Preview")
               ),
               
@@ -737,7 +875,10 @@ function App() {
                 skin.overlayImg && React.createElement(Button, { 
                   variant: "cyan", 
                   size: "sm", 
-                  onClick: () => setPreview3D({ show: true, url: skin.overlayImg.src, status: 'Loading overlay preview...', mode: 'overlay' })
+                  onClick: () => {
+                    setPreview3D({ show: true, url: skin.overlayImg.src, status: 'Loading overlay preview...', mode: 'overlay' });
+                    scrollToPreview();
+                  }
                 }, React.createElement(Eye, { className: "mr-1" }), "Preview")
               ),
               
@@ -795,25 +936,38 @@ function App() {
           )
         ),
 
-        // Right column - 3D Preview
-        React.createElement('div', { className: "space-y-6" },
+        // Right columns - 3D Preview (spans 2 columns)
+        React.createElement('div', { className: "xl:col-span-2 space-y-6" },
+          // 3D Preview with background options in the right area
           React.createElement(Card, { className: "bg-white/5" },
             React.createElement('h3', { className: "text-xl font-semibold text-white mb-4" }, "3D Preview"),
-            React.createElement('div', { className: "space-y-4" },
-              React.createElement(SkinViewer3D, {
-                skinUrl: preview3D.url,
-                isVisible: preview3D.show,
-                viewMode: preview3D.mode || 'merged',
-                onStatusChange: (status) => setPreview3D(prev => ({ ...prev, status }))
-              }),
-              React.createElement('div', { 
-                className: `text-sm p-3 rounded-lg ${preview3D.show ? 'text-emerald-300 bg-emerald-500/10' : 'text-slate-300 bg-slate-700/30'}` 
-              }, preview3D.status),
-              !preview3D.show && React.createElement('div', { className: "text-center py-8 text-slate-400 border-2 border-dashed border-slate-600 rounded-lg" },
-                React.createElement('div', { className: "space-y-2" },
-                  React.createElement('p', null, "🎮 Upload both skins and click"),
-                  React.createElement('p', { className: "font-semibold" }, "'Preview 3D' to see the result!")
+            React.createElement('div', { className: "grid grid-cols-4 gap-6" },
+              // Left side - 3D Viewer (takes 3 columns)
+              React.createElement('div', { className: "col-span-3 space-y-4" },
+                React.createElement(SkinViewer3D, {
+                  skinUrl: preview3D.url,
+                  isVisible: preview3D.show,
+                  viewMode: preview3D.mode || 'merged',
+                  backgroundOptions: backgroundOptions,
+                  onStatusChange: (status) => setPreview3D(prev => ({ ...prev, status }))
+                }),
+                React.createElement('div', { 
+                  className: `text-sm p-3 rounded-lg ${preview3D.show ? 'text-emerald-300 bg-emerald-500/10' : 'text-slate-300 bg-slate-700/30'}` 
+                }, preview3D.status),
+                !preview3D.show && React.createElement('div', { className: "text-center py-8 text-slate-400 border-2 border-dashed border-slate-600 rounded-lg" },
+                  React.createElement('div', { className: "space-y-2" },
+                    React.createElement('p', null, "🎮 Upload both skins and click"),
+                    React.createElement('p', { className: "font-semibold" }, "'Preview 3D' to see the result!")
+                  )
                 )
+              ),
+              
+              // Right side - Background options in the green zone (takes 1 column)
+              React.createElement('div', { className: "col-span-1" },
+                preview3D.show && React.createElement(BackgroundOptions, {
+                  backgroundOptions: backgroundOptions,
+                  onBackgroundChange: setBackgroundOptions
+                })
               )
             )
           )
@@ -838,24 +992,124 @@ function App() {
       onSelectOverlay: handleZipOverlaySelect
     }),
 
-    // Development notice banner at bottom
-    React.createElement('div', { className: "bg-gradient-to-r from-orange-500/90 to-orange-600/90 backdrop-blur-sm text-white p-3 text-center border-t border-orange-400/20" },
-      React.createElement('div', { className: "max-w-7xl mx-auto" },
-        React.createElement('p', { className: "text-sm font-semibold" },
-          "🚧 This site is still in development! Please message ",
-          React.createElement('span', { className: "font-bold underline" }, "ph4_0"),
-          " on Discord for any issues or feedback."
-        )
-      )
+    // Development notice banner - positioned to move with content for glassmorphism effect
+    React.createElement('div', { 
+      style: {
+        position: 'sticky',
+        bottom: '0',
+        left: '0',
+        right: '0',
+        marginTop: '2rem',
+        zIndex: '99999',
+        background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(6, 182, 212, 0.22), rgba(16, 185, 129, 0.25))',
+        backdropFilter: 'blur(20px) saturate(1.5)',
+        WebkitBackdropFilter: 'blur(20px) saturate(1.5)',
+        color: 'white',
+        padding: '16px',
+        textAlign: 'center',
+        fontSize: '14px',
+        fontWeight: '500',
+        borderTop: '1px solid rgba(16, 185, 129, 0.4)',
+        borderRadius: '12px 12px 0 0',
+        boxShadow: '0 -10px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 40px rgba(16, 185, 129, 0.12)',
+        textShadow: '0 0 10px rgba(16, 185, 129, 0.5)',
+        animation: 'pulseGlow 4s ease-in-out infinite'
+      }
+    },
+      "🚧 This site is still in development! Please message ",
+      React.createElement('span', { 
+        style: { 
+          fontWeight: 'bold', 
+          color: '#34d399',
+          textShadow: '0 0 15px rgba(52, 211, 153, 0.6)',
+          transition: 'all 0.3s ease'
+        },
+        onMouseEnter: (e) => {
+          e.target.style.color = '#10feca';
+          e.target.style.textShadow = '0 0 20px rgba(16, 254, 202, 0.8)';
+        },
+        onMouseLeave: (e) => {
+          e.target.style.color = '#34d399';
+          e.target.style.textShadow = '0 0 15px rgba(52, 211, 153, 0.6)';
+        }
+      }, "ph4_0"),
+      " on Discord for any issues or feedback."
     )
   );
 }
 
-// Bootstrap the app
+// Bootstrap the app with dependency checking
 if (typeof window !== 'undefined') {
   const root = document.getElementById('root');
   if (root) {
-    const reactRoot = createRoot(root);
-    reactRoot.render(React.createElement(App));
+    let attempts = 0;
+    const maxAttempts = 150; // 15 seconds at 100ms intervals
+    
+    // Wait for all required dependencies before starting
+    const waitForDependencies = () => {
+      attempts++;
+      
+      // Check if all required libraries are loaded
+      const hasReact = window.React && window.ReactDOM && window.React.createElement;
+      const hasJSZip = window.JSZip;
+      const hasBabel = window.Babel; // Babel should be loaded for JSX transform
+      
+      if (hasReact && hasJSZip && hasBabel) {
+        try {
+          // Ensure createRoot is available
+          if (!createRoot) {
+            throw new Error('createRoot not available from ReactDOM');
+          }
+          
+          const reactRoot = createRoot(root);
+          reactRoot.render(React.createElement(App));
+          
+          // Mark app as successfully started
+          if (window.markAppStarted) {
+            // Small delay to ensure render is complete
+            setTimeout(() => {
+              window.markAppStarted();
+              console.log('✅ Minecraft Skin Overlay Merger loaded successfully!');
+            }, 100);
+          }
+        } catch (error) {
+          console.error('Failed to render React app:', error);
+          // Update loading message to show the error
+          const loadingDetails = document.getElementById('loading-details');
+          if (loadingDetails) {
+            loadingDetails.innerHTML = `
+              <div style="color: #ef4444; margin-top: 0.5rem;">
+                ❌ Render failed: ${error.message}<br>
+                <button onclick="location.reload()" style="margin-top: 0.5rem; padding: 0.25rem 0.5rem; background: #ef4444; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem;">Reload</button>
+              </div>
+            `;
+          }
+          throw error;
+        }
+      } else if (attempts < maxAttempts) {
+        // Try again in 100ms if dependencies aren't ready
+        setTimeout(waitForDependencies, 100);
+      } else {
+        // Timeout - show what's missing
+        const missing = [];
+        if (!hasReact) missing.push('React/ReactDOM');
+        if (!hasJSZip) missing.push('JSZip');
+        if (!hasBabel) missing.push('Babel');
+        
+        console.error('Dependencies failed to load:', missing);
+        const loadingDetails = document.getElementById('loading-details');
+        if (loadingDetails) {
+          loadingDetails.innerHTML = `
+            <div style="color: #ef4444; margin-top: 0.5rem;">
+              ❌ Failed to load: ${missing.join(', ')}<br>
+              <button onclick="location.reload()" style="margin-top: 0.5rem; padding: 0.25rem 0.5rem; background: #ef4444; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem;">Retry</button>
+            </div>
+          `;
+        }
+      }
+    };
+    
+    // Start dependency check after a brief delay to let scripts load
+    setTimeout(waitForDependencies, 200);
   }
 }

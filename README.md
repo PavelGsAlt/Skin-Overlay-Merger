@@ -129,6 +129,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [SkinView3D](https://github.com/bs-community/skinview3d) - 3D Minecraft skin viewer
 - [Three.js](https://threejs.org/) - 3D graphics library
 - [Lucide Icons](https://lucide.dev/) - Beautiful icon set
+- [Tiago Augusto (tiagoadag1203)](https://github.com/tiagoadag1203) - Animated search input component (MIT License)
 - OR Feed community for inspiration and overlay resources
 
 ## 🐛 Known Issues

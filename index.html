@@ -24,6 +24,11 @@
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"></noscript>
   
+  <!-- Preload critical JavaScript dependencies -->
+  <link rel="preload" href="https://unpkg.com/react@18/umd/react.production.min.js" as="script">
+  <link rel="preload" href="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" as="script">
+  <link rel="preload" href="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js" as="script">
+  
   <!-- Critical CSS -->
   <style>
     * {
@@ -43,6 +48,37 @@
     
     #root {
       min-height: 100vh;
+      opacity: 1;
+      transition: opacity 0.3s ease-in;
+    }
+    
+    #root.loading {
+      opacity: 0.95;
+    }
+    
+    .app-container {
+      opacity: 0;
+      animation: fadeIn 0.5s ease-in-out forwards;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 40px rgba(16, 185, 129, 0.12);
+      }
+      50% {
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 60px rgba(16, 185, 129, 0.18);
+      }
     }
     
     .loading {
@@ -117,32 +153,136 @@
     </div>
   </noscript>
   
-  <div id="root">
+  <div id="root" class="loading">
     <div class="loading">
       <div class="spinner"></div>
-      <p>Loading Minecraft Skin Overlay Merger...</p>
+      <p id="loading-text">Loading Minecraft Skin Overlay Merger...</p>
+      <div id="loading-details" style="font-size: 0.875rem; color: #94a3b8; margin-top: 0.5rem;">Initializing dependencies...</div>
     </div>
   </div>
   
-  <!-- Error boundary fallback -->
+  <!-- Enhanced error boundary with dependency checking -->
   <script>
-    window.addEventListener('error', function(e) {
-      console.error('Application error:', e.error);
+    // Track if the app has started successfully
+    let appStarted = false;
+    let errorCount = 0;
+    let lastErrorTime = 0;
+    const MAX_ERRORS = 3;
+    const ERROR_TIMEOUT = 2000; // 2 seconds
+    
+    // Show error only after multiple persistent errors
+    function showErrorScreen(message) {
       const root = document.getElementById('root');
-      if (root) {
+      if (root && !appStarted) {
         root.innerHTML = `
           <div class="error">
-            <h2>Something went wrong</h2>
-            <p>The application encountered an error. Please refresh the page to try again.</p>
-            <p style="margin-top: 1rem;"><strong>Error:</strong> ${e.error?.message || 'Unknown error'}</p>
+            <h2>Loading Failed</h2>
+            <p>The application failed to load properly. This might be due to network issues or script blocking.</p>
+            <p style="margin-top: 1rem;"><strong>Please try:</strong></p>
+            <ul style="text-align: left; margin-top: 0.5rem; color: #94a3b8;">
+              <li>Refreshing the page</li>
+              <li>Checking your internet connection</li>
+              <li>Disabling ad blockers temporarily</li>
+            </ul>
+            <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #10b981; color: white; border: none; border-radius: 0.5rem; cursor: pointer;">Refresh Page</button>
+            <p style="margin-top: 1rem; font-size: 0.75rem; opacity: 0.7;"><strong>Technical:</strong> ${message}</p>
           </div>
         `;
       }
+    }
+    
+    // More tolerant error handling
+    window.addEventListener('error', function(e) {
+      const now = Date.now();
+      
+      // Reset error count if enough time has passed
+      if (now - lastErrorTime > ERROR_TIMEOUT) {
+        errorCount = 0;
+      }
+      
+      errorCount++;
+      lastErrorTime = now;
+      
+      console.error('Application error:', e.error);
+      
+      // Only show error screen after multiple rapid errors and app hasn't started
+      if (errorCount >= MAX_ERRORS && !appStarted) {
+        showErrorScreen(e.error?.message || 'Multiple script errors detected');
+      }
     });
     
+    // Handle promise rejections more gracefully
     window.addEventListener('unhandledrejection', function(e) {
       console.error('Unhandled promise rejection:', e.reason);
+      // Don't show error screen for promise rejections unless they're critical
+      if (e.reason && e.reason.message && e.reason.message.includes('React')) {
+        errorCount++;
+        if (errorCount >= MAX_ERRORS && !appStarted) {
+          showErrorScreen('React initialization failed: ' + e.reason.message);
+        }
+      }
     });
+    
+    // Mark app as started when React successfully renders
+    window.markAppStarted = function() {
+      appStarted = true;
+      errorCount = 0;
+      
+      // Add smooth transition when app loads
+      const root = document.getElementById('root');
+      if (root) {
+        root.classList.remove('loading');
+      }
+    };
+    
+    // Update loading status as dependencies load
+    let loadedDeps = [];
+    const totalDeps = ['React', 'ReactDOM', 'Babel', 'Three.js', 'SkinView3D', 'JSZip'];
+    
+    function updateLoadingStatus() {
+      const loadingDetails = document.getElementById('loading-details');
+      if (!loadingDetails || appStarted) return;
+      
+      loadedDeps = [];
+      if (window.React) loadedDeps.push('React');
+      if (window.ReactDOM) loadedDeps.push('ReactDOM');
+      if (window.Babel) loadedDeps.push('Babel');
+      if (window.THREE) loadedDeps.push('Three.js');
+      if (window.skinview3d) loadedDeps.push('SkinView3D');
+      if (window.JSZip) loadedDeps.push('JSZip');
+      
+      const progress = Math.round((loadedDeps.length / totalDeps.length) * 100);
+      loadingDetails.textContent = `Loading dependencies... ${progress}% (${loadedDeps.length}/${totalDeps.length})`;
+      
+      if (loadedDeps.length === totalDeps.length) {
+        loadingDetails.textContent = 'All dependencies loaded! Starting application...';
+      }
+    }
+    
+    // Check loading status periodically
+    const statusInterval = setInterval(() => {
+      if (appStarted) {
+        clearInterval(statusInterval);
+        return;
+      }
+      updateLoadingStatus();
+    }, 200);
+    
+    // Safety timeout - if app doesn't start within 15 seconds, show fallback
+    setTimeout(() => {
+      if (!appStarted) {
+        const loadingDetails = document.getElementById('loading-details');
+        if (loadingDetails) {
+          loadingDetails.innerHTML = `
+            <div style="color: #f59e0b; margin-top: 0.5rem;">
+              ⚠️ Loading is taking longer than expected.<br>
+              <button onclick="location.reload()" style="margin-top: 0.5rem; padding: 0.25rem 0.5rem; background: #10b981; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem;">Refresh Page</button>
+            </div>
+          `;
+        }
+        clearInterval(statusInterval);
+      }
+    }, 15000);
   </script>
   
   <!-- React and ReactDOM from CDN -->
@@ -152,9 +292,7 @@
   <!-- Babel for JSX transformation -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   
-  <!-- Lucide React -->
-  <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
-  
+
   <!-- JSZip for handling ZIP files -->
   <script src="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"></script>
   

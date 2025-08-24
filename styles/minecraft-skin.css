@@ -12,10 +12,10 @@
 .bg-gradient-cyber {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #0f172a 50%, #1e293b 75%, #0f172a 100%);
   background-size: 400% 400%;
-  animation: gradientShift 15s ease infinite;
+  animation: gradientShiftCyber 15s ease infinite;
 }
 
-@keyframes gradientShift {
+@keyframes gradientShiftCyber {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
 }

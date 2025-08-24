@@ -1,59 +1,74 @@
-/* Global Styles for Minecraft Skin Overlay Merger */
+/* Enhanced Global Styles for Minecraft Skin Overlay Merger */
 
-/* CSS Custom Properties (Variables) */
+/* Modern CSS Custom Properties (Variables) */
 :root {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
+  /* Enhanced Background Colors */
+  --bg-primary: #0a0b14;
+  --bg-secondary: #151829;
   --text-primary: #ffffff;
-  --text-secondary: #94a3b8;
+  --text-secondary: #e2e8f0;
+  --text-muted: #94a3b8;
   --accent-emerald: #10b981;
   --accent-cyan: #06b6d4;
-  --border-primary: rgba(255, 255, 255, 0.1);
-  --border-secondary: rgba(255, 255, 255, 0.2);
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.3);
+  --border-primary: rgba(255, 255, 255, 0.08);
+  --border-secondary: rgba(255, 255, 255, 0.15);
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --shadow-glow: 0 0 25px rgba(16, 185, 129, 0.4);
+  
+  /* Modern spacing scale */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
 }
 
-/* Global Reset */
+/* Enhanced Global Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Typography */
+/* Improved Typography Base */
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  font-size: 15px;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
 }
 
-/* Smooth Transitions */
+/* Enhanced Smooth Transitions */
 * {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
+  transition-duration: 200ms;
 }
 
-/* Focus Management */
+/* Modern Focus Management */
 :focus {
   outline: none;
 }
 
 :focus-visible {
   outline: 2px solid var(--accent-emerald);
-  outline-offset: 2px;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
 }
 
-/* Selection Styles */
+/* Enhanced Selection Styles */
 ::selection {
   background-color: var(--accent-emerald);
   color: white;
+  text-shadow: none;
 }
 
-/* Scrollbar Styling */
+/* Modern Scrollbar Styling */
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--accent-emerald) var(--bg-secondary);
@@ -79,15 +94,15 @@ body {
   background: linear-gradient(135deg, #059669, #0891b2);
 }
 
-/* Glass Morphism Effect */
+/* Enhanced Glass Morphism Effect */
 .glass-effect {
   background: var(--glass-bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(15px) saturate(1.5);
+  -webkit-backdrop-filter: blur(15px) saturate(1.5);
   border: 1px solid var(--border-primary);
 }
 
-/* Loading States */
+/* Modern Loading States */
 .loading-skeleton {
   background: linear-gradient(90deg, var(--bg-secondary) 25%, rgba(255, 255, 255, 0.1) 50%, var(--bg-secondary) 75%);
   background-size: 200% 100%;
@@ -99,7 +114,7 @@ body {
   100% { background-position: 200% 0; }
 }
 
-/* Accessibility */
+/* Enhanced Accessibility */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -111,24 +126,24 @@ body {
   }
 }
 
-/* High Contrast Mode */
+/* Enhanced High Contrast Mode */
 @media (prefers-contrast: high) {
   :root {
     --bg-primary: #000000;
     --bg-secondary: #1a1a1a;
     --text-primary: #ffffff;
-    --text-secondary: #cccccc;
-    --border-primary: rgba(255, 255, 255, 0.3);
-    --border-secondary: rgba(255, 255, 255, 0.5);
+    --text-secondary: #e0e0e0;
+    --border-primary: rgba(255, 255, 255, 0.4);
+    --border-secondary: rgba(255, 255, 255, 0.6);
   }
 }
 
-/* Dark Mode Overrides (if needed) */
+/* Dark Mode Optimizations */
 @media (prefers-color-scheme: dark) {
-  /* Already optimized for dark mode */
+  /* Already optimized for dark mode by default */
 }
 
-/* Print Styles */
+/* Enhanced Print Styles */
 @media print {
   * {
     background: transparent !important;
@@ -140,29 +155,39 @@ body {
   .no-print {
     display: none !important;
   }
+  
+  body {
+    font-size: 12pt;
+    line-height: 1.5;
+  }
 }
 
-/* Mobile Optimization */
+/* Modern Mobile Optimization */
 @media (max-width: 768px) {
   body {
     font-size: 14px;
   }
   
   .mobile-hidden {
-    display: none;
+    display: none !important;
+  }
+  
+  /* Enhanced touch targets */
+  button, input, select, textarea {
+    min-height: 44px;
   }
 }
 
 /* Tablet Optimization */
 @media (min-width: 768px) and (max-width: 1024px) {
   .tablet-hidden {
-    display: none;
+    display: none !important;
   }
 }
 
 /* Desktop Optimization */
 @media (min-width: 1024px) {
   .desktop-hidden {
-    display: none;
+    display: none !important;
   }
 }

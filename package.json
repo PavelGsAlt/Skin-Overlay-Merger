@@ -34,9 +34,7 @@
   },
   "homepage": "https://pavelgsalt.github.io",
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^7.0.0",
-    "jszip": "^3.10.1",
-    "lucide-react": "^0.539.0"
+    "jszip": "^3.10.1"
   },
   "devDependencies": {
     "@types/react": "^19.1.10",
