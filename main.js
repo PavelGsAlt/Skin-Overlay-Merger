@@ -30,16 +30,43 @@ const Badge = ({ children, className = "" }) =>
 
 const Modal = ({ isOpen, onClose, children, title }) => {
   if (!isOpen) return null;
+  
+  // Function to adjust modal position when opened
+  const adjustModalPosition = () => {
+    // Small delay to ensure modal is rendered
+    setTimeout(() => {
+      const modalOverlay = document.querySelector('.modal-overlay');
+      if (modalOverlay) {
+        // Force reflow to ensure proper positioning
+        modalOverlay.style.transform = 'translateZ(0)';
+      }
+    }, 10);
+  };
+  
+  // Prevent background scrolling when modal opens
+  React.useEffect(() => {
+    if (isOpen) {
+      // Disable scrolling on body
+      document.body.style.overflow = 'hidden';
+      adjustModalPosition();
+    }
+    
+    // Re-enable scrolling when modal closes
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+  
   return React.createElement('div', {
-    className: "fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm",
+    className: "modal-overlay",
     onClick: (e) => e.target === e.currentTarget && onClose()
   },
-    React.createElement('div', { className: "bg-slate-900 rounded-xl border border-slate-700 w-full max-w-4xl max-h-90vh overflow-hidden" },
-      React.createElement('div', { className: "p-6 border-b border-slate-700 flex justify-between items-center" },
+    React.createElement('div', { className: "modal-content" },
+      React.createElement('div', { className: "modal-header" },
         React.createElement('h2', { className: "text-xl font-bold text-white" }, title),
         React.createElement(Button, { variant: "ghost", size: "sm", onClick: onClose }, "✕")
       ),
-      React.createElement('div', { className: "p-6 overflow-auto max-h-96" }, children)
+      React.createElement('div', { className: "modal-body" }, children)
     )
   );
 };
@@ -129,8 +156,8 @@ const SkinNameBrowser = ({ isOpen, onClose, onSelectSkin }) => {
   };
 
   return React.createElement(Modal, { isOpen, onClose, title: "Browse Skin by Username" },
-    React.createElement('div', { className: "space-y-4" },
-      React.createElement('form', { onSubmit: handleSubmit, className: "space-y-4" },
+    React.createElement('div', { className: "space-y-4 w-full" },
+      React.createElement('form', { onSubmit: handleSubmit, className: "space-y-4 w-full" },
         React.createElement('div', null,
           React.createElement('label', { className: "block text-sm font-medium text-white mb-2" }, "Minecraft Username:"),
           // Animated search input by Tiago Augusto (tiagoadag1203) - MIT License
@@ -139,7 +166,7 @@ const SkinNameBrowser = ({ isOpen, onClose, onSelectSkin }) => {
             value: username,
             onChange: (e) => setUsername(e.target.value),
             placeholder: "Enter Minecraft username...",
-            className: "animated-search-input",
+            className: "animated-search-input w-full",
             disabled: loading
           })
         ),
@@ -266,10 +293,10 @@ const ZipOverlayBrowser = ({ isOpen, onClose, onSelectOverlay }) => {
   };
 
   return React.createElement(Modal, { isOpen, onClose, title: "Browse OR Feed Overlays" },
-    React.createElement('div', { className: "space-y-4" },
+    React.createElement('div', { className: "space-y-4 w-full" },
       // Search and skin type selector
-      React.createElement('div', { className: "flex gap-6 items-center" },
-        React.createElement('div', { className: "relative flex-1" },
+      React.createElement('div', { className: "flex flex-col md:flex-row gap-3 md:gap-6 items-center" },
+        React.createElement('div', { className: "relative flex-1 w-full" },
           // Animated search input by Tiago Augusto (tiagoadag1203) - MIT License
           React.createElement('input', {
             type: "text",
@@ -280,7 +307,7 @@ const ZipOverlayBrowser = ({ isOpen, onClose, onSelectOverlay }) => {
           })
         ),
         // Enhanced switch-style skin type selector
-        React.createElement('div', { className: "flex items-center bg-slate-800/40 p-1 rounded-xl border border-slate-600/30 shadow-lg" },
+        React.createElement('div', { className: "flex items-center bg-slate-800/40 p-1 rounded-xl border border-slate-600/30 shadow-lg self-end" },
           React.createElement('button', {
             onClick: () => setSelectedSkinType('slim'),
             className: `px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ease-out ${
@@ -307,7 +334,7 @@ const ZipOverlayBrowser = ({ isOpen, onClose, onSelectOverlay }) => {
         React.createElement('div', { className: "text-sm text-slate-400" }, 
           `Found ${filteredOverlays.length} overlay${filteredOverlays.length !== 1 ? 's' : ''}`
         ),
-        React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto p-2" },
+        React.createElement('div', { className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 max-h-96 overflow-y-auto p-2" },
           filteredOverlays.map(overlay =>
             React.createElement('div', {
               key: overlay.name,
@@ -353,10 +380,6 @@ const ZipOverlayBrowser = ({ isOpen, onClose, onSelectOverlay }) => {
             )
           )
         )
-      ),
-      
-      !loading && filteredOverlays.length === 0 && !error && React.createElement('div', { className: "text-center py-8 text-slate-400" },
-        "No overlays found matching your search."
       )
     )
   );
@@ -769,7 +792,7 @@ function App() {
       React.createElement('div', { className: "max-w-7xl mx-auto" },
         React.createElement('div', { className: "flex items-center justify-between flex-wrap gap-4" },
           React.createElement('div', null,
-            React.createElement('h1', { className: "text-3xl font-bold text-white" }, "Minecraft Skin Overlay Merger"),
+            React.createElement('h1', { className: "text-3xl font-bold site-title" }, "Minecraft Skin Overlay Merger"),
             React.createElement('p', { className: "text-emerald-400 mt-2" }, "Merge skins with overlays • 3D Preview • OR Feed Overlays • Browse by Name • Client-side processing")
           ),
           React.createElement('div', { className: "flex gap-2 flex-wrap" },
