@@ -17,11 +17,14 @@ A client-side web application for merging Minecraft skins with overlays using a 
 
 1. **Upload Base Skin**: Click or drag & drop your main Minecraft skin (64×64 PNG recommended)
 2. **Upload Overlay**: Add your overlay/accessory PNG file  
-3. **Merge & Download**: Click the merge button to download your combined skin
+3. **Preview in 3D**: Check how your skin looks before finalizing
+4. **Merge & Download**: Click the merge button to download your combined skin
 
 ## 🌐 Live Demo
 
 Visit: [https://pavelgsalt.github.io](https://pavelgsalt.github.io)
+
+<!-- Force rebuild: 2025-08-25 -->
 
 ## 🛠️ Development
 
